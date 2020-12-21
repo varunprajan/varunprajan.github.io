@@ -44,15 +44,15 @@ our revenue query for the report would be:
 
 ```sql
 SELECT
-    order_items.ordered_at::DATE,
+    items.ordered_at::DATE,
     -- ignore revenue for which a matching code/date cannot be found
-    SUM(order_items.amount * COALESCE(historical_exchange_rates.exchange_rate_usd, 0))
-FROM order_items
-LEFT JOIN historical_exchange_rates ON order_items.ordered_at::DATE = historical_exchange_rates.date
-                                    AND order_items.currency_code = historical_exchange_rates.currency_code
+    SUM(items.amount * COALESCE(rates.exchange_rate_usd, 0))
+FROM order_items AS items
+LEFT JOIN historical_exchange_rates AS rates ON items.ordered_at::DATE = rates.date
+                                             AND items.currency_code = rates.currency_code
 WHERE
     -- only report on data from the last 60 days
-    ordered_at > CURRENT_DATE - INTERVAL '60 DAY'
+    items.ordered_at > CURRENT_DATE - INTERVAL '60 DAY'
 GROUP BY 1
 ```
 
