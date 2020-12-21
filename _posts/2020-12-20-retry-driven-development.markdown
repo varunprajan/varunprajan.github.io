@@ -119,7 +119,7 @@ Yet it is also the case that this ETL pipeline does not work well. The issues st
 
 Suppose something in the ETL job breaks (as it inevitably will). We would like to tinker with and run the code locally in order to debug the issue. Is this safe to do? Actually, no. Unless we have a way to mock out the (Redshift) data warehouse locally, we risk writing to our (production) table. And, if the Redshift connection were mocked locally, we would not be able to test that the `append_data` function works properly. (Note that, since our test suite uses mocks, it also does not truly test the functionality of this method). What we need is a way to run a job locally that does not touch production data, but still touches Redshift.
 
-One easy way to support this workflow is to create a development schema (let's say, `varun_dev`). (As an aside, `dbt` enforces [this same workflow](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-custom-schemas#managing-environments)). Then, we can use a Python package (I prefer `dynaconf`, but there are others) that sets a configuration variable differently if the code is run in the "development" environment vs. the "production" one. The code would look something like this:
+One easy way to support this workflow is to create a development schema (let's say, `varun_dev`). (As an aside, `dbt` enforces [this same workflow](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-custom-schemas#managing-environments)). Then, we can use a Python package (I prefer [`dynaconf`](https://www.dynaconf.com/), but there are others) that sets a configuration variable differently if the code is run in the "development" environment vs. the "production" one. The code would look something like this:
 
 ```python
 from dynaconf import settings
@@ -129,11 +129,9 @@ SCHEMA_NAME = settings.HISTORICAL_EXCHANGE_RATES.SCHEMA_NAME
 
 def main():
     ...
-      # insert (append) it into our data warehouse table
+    # insert (append) it into our data warehouse table
     append_data(frame, db_conn=DB_CONN, table=TABLE_NAME, schema=SCHEMA_NAME)
 ```
-
- 
 
 A further advantage of this approach is that multiple developers can work on the same code without interfering with each other: each will have their own development schema.
 
@@ -229,7 +227,7 @@ As you can see, this code handles the historical and current datasets properly, 
 What I like about this case study is that it is (deceptively) simple, yet it reveals many core concepts to data engineering and even data science. In my view, the principal conclusions are:
 
 1. Be compassionate towards your future self. Your ETL code will undoubtedly break. Write your code so that it can be retried afterwards (i.e., after fixing it) both safely and correctly.
-2. An added benefit of retry-driven development is that it forces you to break larger tasks down into smaller ones, in the same way that test-driven development forces you to write smaller, more testable functions. The result is "data flows" that are easier to reason about, not only because they are smaller but also because they can be safely retried without much thought.
+2. Retry-driven development has secondary benefits. An important one is that it forces you to break larger tasks down into smaller ones, in the same way that test-driven development forces you to write smaller, more testable functions. The result is "data flows" that are easier to reason about, not only because they are smaller but also because they can be safely retried without much thought.
 3. Use environments to avoid touching production data. This is probably obvious to those with an engineering background, but perhaps not to some data scientists or other "hackers" who are [often recruited](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/) to write ETL.
 4. External data is often ephemeral. If it is not too costly, saving the raw data to a data store is a good way to be able to reconstruct the data of interest at a later date.
 5. Thinking about time is surprisingly tricky! Try to walk through the possible retry scenarios (rerunning historical tasks, retrying failed tasks on the same day, and on a different day, etc.) before you write code, not after. Distinguishing between the logical data and actual date will help you reason about these cases.
