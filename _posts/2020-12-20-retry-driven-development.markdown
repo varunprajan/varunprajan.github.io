@@ -14,7 +14,7 @@ To be clear, I am not claiming credit for this idea. In fact, much of this post 
 
 ## A case study
 
-Suppose we work for a retail company that has historically operated only in the United States, but  now seeks to expand its operations worldwide. We can imagine an `order_items` table that used to look like this:
+Suppose we work for a retail company that has historically operated only in the United States, but now seeks to expand its operations worldwide. We can imagine an `order_items` table that used to look like this:
 
 | order_item_id | order_id | item_name | amount_usd | ordered_at |
 | :-----------: | :------: | :-------: | :--------: | :--------: |
@@ -60,7 +60,7 @@ which is actually fairly straightforward. (Whether this is good enough for finan
 
 ## ETL, first attempt
 
-Our first attempt at an ETL script for this `historical_exchange_rates` table might look something like this. For brevity, I've omitted most of the code, but it is available on Github [TODO]).
+Our first attempt at an ETL script for this `historical_exchange_rates` table might look something like the Python code below. For brevity, I've omitted many of the details, but the entire script is available on Github [TODO]).
 
 ```python
 import logging
@@ -68,8 +68,8 @@ logger = logging.getLogger(__name__)
 
 BASE_CURRENCY = "USD"
 DB_CONN = RedshiftConnection(...)
-EXCHANGE_RATES_URL = "https://openexchangerates.org/api/"
 EMAIL_RECIPIENTS = ["alex@retailstartup.com", "varun@retailstartup.com"]
+EXCHANGE_RATES_URL = "https://openexchangerates.org/api/"
 TABLE_NAME = "historical_exchange_rates"
 
 def retrieve_exchange_rates(base_currency: str, url: str) -> Dict:
@@ -111,13 +111,13 @@ if __name__ == "__main__":
         )
 ```
 
-There are a lot of things to like here (at least I hope so; I'm the one who wrote it!). The code seems fairly modular, and it has function names that make sense. It also uses type hints, which can be enforced [using `mypy`](http://mypy-lang.org/). Suppose further that it has a test suite with full coverage that mocks out the API and database; the tests run via Jenkins; the code is deployed with a one-button deployment; and the job itself runs on a cron at UTC midnight but can be retried with a one-button click if needed. I would wager that this code quality and deployment process is better than most custom-built ETL pipelines at small/medium-sized companies.
+There are a lot of things to like here (at least I hope so; I'm the one who wrote it!). The code seems fairly modular, and it has function names that make sense. It also uses type hints, which can be enforced [using `mypy`](http://mypy-lang.org/). Suppose further that it has a test suite with full coverage that mocks out the API and database; the tests run via Jenkins; the code is deployed with a one-button deployment; and the job itself runs on a cron at UTC midnight but can be retried with a one-button click if needed. I would wager that this code quality and deployment process is better than many custom-built ETL pipelines at small/medium-sized companies.
 
 Yet it is also the case that this ETL pipeline does not work well. The issues stem from violating the principle of retry-driven development: if something fails, the code cannot be retried safely and/or correctly. There are a few reasons:
 
 ## Lack of separation of environments
 
-Suppose something in the ETL job breaks (as it inevitably will). We would like to tinker with and run the code locally in order to debug the issue. Is this safe to do? Actually, no. Unless we have a way to mock out the (Redshift) data warehouse locally, we risk writing to our (production) table. And, if the Redshift connection were mocked locally, we would not be able to test that the `append_data` function works properly. (Note that, since our test suite uses mocks, it also does not truly test the functionality of this method). What we need is a way to run a job locally that does not touch production data, but still touches Redshift.
+Suppose something in the ETL job breaks (as it inevitably will). We would like to tinker with and run the code locally in order to debug the issue. Is this safe to do? Actually, no. Unless we have a way to mock out the (Redshift) data warehouse locally, we risk writing to our production table. And, if the Redshift connection were mocked locally, we would not be able to test that the `append_data` function works properly. (Note that, since our test suite uses mocks, it also does not truly test the functionality of this method). What we need is a way to run a job locally that does not touch production data, but still touches Redshift.
 
 One easy way to support this workflow is to create a development schema (let's say, `varun_dev`). (As an aside, `dbt` enforces [this same workflow](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-custom-schemas#managing-environments)). Then, we can use a Python package (I prefer [`dynaconf`](https://www.dynaconf.com/), but there are others) that sets a configuration variable differently if the code is run in the "development" environment vs. the "production" one. The code would look something like this:
 
@@ -131,6 +131,7 @@ def main():
     ...
     # insert (append) it into our data warehouse table
     append_data(frame, db_conn=DB_CONN, table=TABLE_NAME, schema=SCHEMA_NAME)
+    ...
 ```
 
 A further advantage of this approach is that multiple developers can work on the same code without interfering with each other: each will have their own development schema.
@@ -164,7 +165,7 @@ Note that upsertion is a more expensive process than appending: it involves dele
 
 ### Modularize the tasks
 
-A different approach is to "modularize" our tasks, not just our code. What does this mean? We generally to write our code to maximize reusability and obey the single responsibility principle: that each function should do only one thing. Here, one function extracts the data (`retrieve_exchange_rates`), another transforms it (`transform_data`), another loads it into the data warehouse (`append_data` or `upsert_data`), and yet another sends the email (`email_notification`). However, we have not written our tasks the same way. There is a single script that is executed via cron: it does all of the things listed above in sequence. Because different behavior occurs depending on exactly where this task fails, the retry logic becomes confusing.
+A different approach is to "modularize" our tasks, not just our code. What does this mean? We generally write our code to maximize reusability and obey the single responsibility principle: that each function should do only one thing. Here, one function extracts the data (`retrieve_exchange_rates`), another transforms it (`transform_data`), another loads it into the data warehouse (`append_data` or `upsert_data`), and yet another sends the email (`email_notification`). However, we have not written our tasks the same way. There is a single script that is executed via cron: it does all of the things listed above in sequence. Because different behavior occurs depending on exactly where this task fails, the retry logic becomes confusing.
 
 As an alternative, we can break up this single task into two or more tasks. For example:
 
@@ -188,7 +189,7 @@ Task 4: email notification
 
 Although this makes the code significantly more complicated, using S3 as an intermediate data store is actually a powerful paradigm that has non-obvious advantages, as we will see shortly.
 
-(One final note on this topic: in production, I would recommend using both approaches: task modularization and upserting instead of appending. They do not interfere with one another and might even be seen as complementary.)
+One final note on this topic: in production, I would recommend using both approaches: task modularization and upserting instead of appending. They do not interfere with one another and might even be seen as complementary.
 
 ## Dealing with time
 
@@ -200,7 +201,7 @@ Suppose that we are not able to retry the script on the same day. What happens, 
 
 We can make a final set of improvements to our script. The obvious one is to use the *historical* exchange rates API endpoint instead of the current one. This seems easy but in fact it is incompatible with the original cron scheduler. The issue has to do with the "logical date" vs the actual date. If we retry the Dec 1 job on Dec 3, we want the date passed to the API endpoint to be Dec 1, *not* Dec 3. In other words, each daily run of the ETL job has a "logical date" associated with it, and, even when retrying later, that logical date needs to be attached to that run. Using the actual date in place of the logical date leads to errors. While cron does not handle this issue, both Airflow and Prefect do.
 
-For many data sources, historical data is not readily available. The example of exchange rates that forms the basis of the case study is perhaps too optimistic. Supporting historical data lookups adds extra work (and possibly also blows up the size of the database), and many APIs choose not to support it (or, at the very least, limit the amount of time that you can look back). How do we deal with time in these cases?
+For many data sources, historical data is not readily available. The example of exchange rates that forms the basis of the case study might therefore be considered too optimistic. Supporting historical data lookups adds extra work (and possibly also blows up the size of the database backing the API), and many APIs choose not to support it (or, at the very least, limit the amount of time that you can look back). How do we deal with time in these cases?
 
 The solution is actually one we've already mentioned: modularizing the tasks! The key idea here is that, if we save the raw data first, then "downstream" tasks (tasks that occur after saving the raw data) can be retried both safely and correctly. Of course, if that first task fails, we're still borked, but at least errors in other parts of the code are not critical.
 
@@ -213,7 +214,8 @@ def transform_data(raw_data_file: str) -> pd.DataFrame:
     [read_raw_data_from_s3]
     [original transformation code]
 
-    frame = frame.rename(columns={"exchange_rate": "exchange_rate_usd"})
+    if "exchange_rate" in frame:
+        frame = frame.rename(columns={"exchange_rate": "exchange_rate_usd"})
     if "base_currency_code" not in frame:
         frame["base_currency_code"] = "USD"
 
@@ -228,7 +230,7 @@ What I like about this case study is that it is (deceptively) simple, yet it rev
 
 1. Be compassionate towards your future self. Your ETL code will undoubtedly break. Write your code so that it can be retried afterwards (i.e., after fixing it) both safely and correctly.
 2. Retry-driven development has secondary benefits. An important one is that it forces you to break larger tasks down into smaller ones, in the same way that test-driven development forces you to write smaller, more testable functions. The result is "data flows" that are easier to reason about, not only because they are smaller but also because they can be safely retried without much thought.
-3. Use environments to avoid touching production data. This is probably obvious to those with an engineering background, but perhaps not to some data scientists or other "hackers" who are [often recruited](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/) to write ETL.
+3. Use environments to avoid touching production data. This is probably obvious to those with an engineering background, but perhaps not to some data scientists or "hackers" who are [often recruited](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/) to write ETL.
 4. External data is often ephemeral. If it is not too costly, saving the raw data to a data store is a good way to be able to reconstruct the data of interest at a later date.
 5. Thinking about time is surprisingly tricky! Try to walk through the possible retry scenarios (rerunning historical tasks, retrying failed tasks on the same day, and on a different day, etc.) before you write code, not after. Distinguishing between the logical data and actual date will help you reason about these cases.
 6. At some point, cron won't be good enough. Proper workflow management tools add immeasurable value by making recovering from failure straightforward and efficient (only failed tasks need to be retried, not the entire job).
