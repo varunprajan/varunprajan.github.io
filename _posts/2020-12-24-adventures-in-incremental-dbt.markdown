@@ -325,7 +325,7 @@ WHERE
     -- superfluous, but might help query optimizer
     AND date >= birth_date
     AND DATEDIFF(DAY, date, CURRENT_DATE) < {% max(day_windows) %}
-GROUP BY 1, 2
+GROUP BY 1, 2, 3
 )
 
 SELECT
@@ -368,7 +368,7 @@ FROM {{ ref('user_transactions') }}
 WHERE
     DATEDIFF(DAY, birth_date, '{{ var("date_of_interest") }}' ) = {{ var("day_window") }}
     AND date <= '{{ var("date_of_interest") }}'
-GROUP BY 1, 2
+GROUP BY 1, 2, 3
 )
 
 SELECT
@@ -384,13 +384,13 @@ Note further that, in theory, all of these runs could be executed concurrently. 
 
 This approach is very similar to the "functional" approach to transformations, discussed [here](https://medium.com/@maximebeauchemin/functional-data-engineering-a-modern-paradigm-for-batch-data-processing-2327ec32c42a). Each dbt run would process a chunk of data and generate a disjoint "partition", indexed by the `user_day_window_id`. The final table can be thought of as the UNION ALL of each of these different `user_day_window` partitions.
 
-Another benefit of this approach is supporting "late arriving" events: in this case, transactions for which the data is received one or more days late, or cases where a transaction is refunded, so we have an additional, negative transaction that arrives one or more days later. We can incorporate these late arriving events into our logic by also running the dbt job for a previous date of interest (say, 7 days ago, by which time we can assume all of the late arriving events have "settled"). This would ensure that we have approximate results immediately, and correct results with a 7 day lag. Again, the normal job and the late arriving job could conceivably run concurrently.
+Another benefit of this approach is supporting "late arriving" events: in this context, these are transactions for which the data is received one or more days late, or cases where a transaction is refunded, so we have an additional, negative transaction that arrives one or more days later. We can incorporate these late arriving events into our logic by also running the `dbt` job for a previous date of interest (say, 7 days ago, by which time we can assume all of the late arriving events have "settled"). This would ensure that we have approximate results immediately, and correct results with a 7 day lag. Again, the normal job and the late arriving job could conceivably run concurrently.
 
 In practice, on the other hand, implementing this solution is not at all easy:
 
 - Multiple `dbt` jobs can be run concurrently, but it is not safe to do so. In particular, the names of intermediate VIEWs might clash, which would lead to race conditions and other bad outcomes.
 - Databases like Redshift struggle with concurrent writes because of serializability guarantees. Telling the compiler that the partitions being generated are indeed disjoint is not easy.
-- `dbt` does not natively support looping over runs/tasks and supplying "logical dates" in the way that a workflow management tool like [Airflow](https://airflow.apache.org/) does. dbt has to be combined with a tool like Airflow to get this functionality. We need the logical date to support things like backfills, retries, table rebuilds using incremental logic alone, and late arriving events. (We can use Airflow's `ds` as dbt's `var("date_of_interest")`.)
+- `dbt` does not natively support looping over runs/tasks and supplying "logical dates" in the way that a workflow management tool like [Airflow](https://airflow.apache.org/) does. `dbt` has to be combined with a tool like Airflow to get this functionality. We need the logical date to support things like backfills, retries, table rebuilds using incremental logic alone, and late arriving events. (We can use Airflow's `ds` as dbt's `var("date_of_interest")`.)
 
 (Others have encountered related issues: [Shopify mentioned](https://shopify.engineering/build-production-grade-workflow-sql-modelling) that "dbt’s current incremental support doesn’t provide safe and consistent methods to handle late arriving data, key resolution, and rebuilds. For this reason, a handful of models (Type 2 dimensions or models in the 1.5B+ event territory) that required incremental semantics weren’t doable—for now.")
 
