@@ -39,6 +39,7 @@ Our goal in this case study is to compute the cumulative revenue per user for va
 
 The simplest approach is to create a derived table (say, `user_cumulative_revenue`), and to refresh the entire table each day. The SQL would look like this:
 
+{% raw %}
 ```sql
 SELECT
     user_id
@@ -65,11 +66,13 @@ SELECT
 FROM {{ ref('user_transactions') }}
 GROUP BY 1, 2
 ```
+{% endraw %}
 
 (where `ref` is `dbt`'s way of referring to other tables/data sources. Note that `[source](https://docs.getdbt.com/docs/building-a-dbt-project/using-sources/)` might be even better than `ref` here.)
 
 Using `dbt`'s jinja functionality, we can clean up the repetitive logic like so:
 
+{% raw %}
 ```sql
 -- attempt_1.sql
 {% set day_windows = [3, 7, 60, 365] %}
@@ -91,9 +94,12 @@ SELECT
 FROM {{ ref('user_transactions') }}
 GROUP BY 1, 2
 ```
+{% endraw %}
+
 
 There's still one error in our logic, however. For day windows that are "incomplete" — for instance, if a user has been with us for only 2 days but we want to find their D3 revenue — we should make the result `NULL`. We want to calculate the D3 revenue only when the 3 day window for a particular user is complete. We can incorporate that logic like so:
 
+{% raw %}
 ```sql
 -- attempt_1_fixed.sql
 {% set day_windows = [3, 7, 60, 365] %}
@@ -123,12 +129,14 @@ SELECT
 FROM {{ ref('user_transactions') }}
 GROUP BY 1, 2
 ```
+{% endraw %}
 
 (Lots of nesting! This could be simplified if your database supports the `IFF` and/or `NULLIF` keywords.)
 
 In other words, we set the DN revenue to be `NULL` if insufficient time has elapsed between the user's `birth_date` and the current date.
 
 (One more subtle note: I'm assuming that the last *complete* day of data is `CURRENT_DATE - 1` . This is true if the `dbt` job runs somewhat after midnight UTC and our data is loaded in a timely way. In practice, this assumption might be dangerous, however, and data ["freshness"](https://docs.getdbt.com/reference/commands/source#dbt-source-snapshot-freshness) checks are probably needed.)
+
 
 ### Attempt 2: incremental, naive
 
@@ -138,6 +146,7 @@ Enter the `dbt` incremental materialization. Here, we have to define a key or se
 
 The SQL looks something like this:
 
+{% raw %}
 ```sql
 -- attempt_2.sql
 {{
@@ -180,6 +189,7 @@ WHERE
 {% endif %}
 GROUP BY 1, 2
 ```
+{% endraw %}
 
 Pretty simple, right? The only things that have changed are the configuration of the `dbt` model and the date filters (in the `WHERE` clause). We can run this in `full-refresh` mode initially, which will create the entire table from scratch by ignoring the `is_incremental` WHERE clause; then, on all subsequent runs, we can run this model in incremental mode, which will respect the `is_incremental` `WHERE` clause and avoid reprocessing data for old users. For more details on how this works, here is the [dbt documentation](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/configuring-incremental-models/) for incremental models.
 
@@ -202,6 +212,7 @@ Regardless, even merely as an intellectual exercise I think it is interesting to
 
 Let's try to directly implement this idea related to cohort maturation. On a given date, we will reprocess only the four `birth_date` cohorts that have matured. My attempt looks like this:
 
+{% raw %}
 ```sql
 -- attempt_3.sql
 {{
@@ -250,6 +261,7 @@ WHERE
 {% endif %}
 GROUP BY 1, 2
 ```
+{% endraw %}
 
 which is starting to get more complicated! We have to modify the `WHERE` clause to filter using equality statements, chained with OR, for the `birth_date`.
 
@@ -277,6 +289,7 @@ and this is what the new, pivoted table looks like:
 
 The unique key for upsertion, in this case, is the combination of the `user_id` and the `day_window`. How might this model be represented in `dbt`? It's not too different from our previous model:
 
+{% raw %}
 ```sql
 -- attempt_pivot_incremental.sql
 {{
@@ -316,6 +329,7 @@ SELECT
     *
 FROM tmp
 ```
+{% endraw %}
 
 When we turn to the "full table" model, things get complicated, though. It is not obvious how to implement this model (without using the `unpivot` macro), which means that we cannot easily have the incremental and full models in the same model file, which `dbt` requires. (If you have ideas, let me know!)
 
@@ -330,6 +344,7 @@ Even if there is a solution to this issue, I think the difficulties we had const
 
 Let me try to expand upon point 2. One relatively straightforward approach would be to run the dbt model for a single tuple of (`day_window`, `date_of_interest`). How might this look? (I'm using the `[vars` syntax](https://docs.getdbt.com/docs/building-a-dbt-project/building-models/using-variables/) to pass these variables into the model.)
 
+{% raw %}
 ```sql
 -- attempt_single_tuple_incremental.sql
 {{
@@ -357,6 +372,7 @@ SELECT
     *
 FROM tmp
 ```
+{% endraw %}
 
 There's actually hardly any Jinja in this solution at all! On a particular date of interest (which we had taken to be synonymous with the current date, but could really be any date at all), we can get the desired `birth_date` cohort by subtracting the `day_window` from that date. For instance, for a date of interest of Jan 1, 2020, and a `day_window` of 365, the `birth_date` is Jan 1, 2019. Then, we simply grab all the transactions that occurred before the date of interest, for users with that birth date. Each `dbt` run would be very fast to execute, particularly for short day windows, but there would be a *lot* of runs: N_dates * N_day_windows.
 
@@ -370,7 +386,7 @@ In practice, on the other hand, implementing this solution is not at all easy:
 
 - Multiple `dbt` jobs can be run concurrently, but it is not safe to do so. In particular, the names of intermediate VIEWs might clash, which would lead to race conditions and other bad outcomes.
 - Databases like Redshift struggle with concurrent writes because of serializability guarantees. Telling the compiler that the partitions being generated are indeed disjoint is not easy.
-- `dbt` does not natively support looping over runs/tasks and supplying "logical dates" in the way that a workflow management tool like [Airflow](https://airflow.apache.org/) does. dbt has to be combined with a tool like Airflow to get this functionality. We need the logical date to support things like backfills, retries, table rebuilds using incremental logic alone, and late arriving events. (We can use Airflow's `{{ ds }}` as dbt's `{{ var("date_of_interest") }}`.)
+- `dbt` does not natively support looping over runs/tasks and supplying "logical dates" in the way that a workflow management tool like [Airflow](https://airflow.apache.org/) does. dbt has to be combined with a tool like Airflow to get this functionality. We need the logical date to support things like backfills, retries, table rebuilds using incremental logic alone, and late arriving events. (We can use Airflow's `ds` as dbt's `var("date_of_interest")`.)
 
 (Others have encountered related issues: [Shopify mentioned](https://shopify.engineering/build-production-grade-workflow-sql-modelling) that "dbt’s current incremental support doesn’t provide safe and consistent methods to handle late arriving data, key resolution, and rebuilds. For this reason, a handful of models (Type 2 dimensions or models in the 1.5B+ event territory) that required incremental semantics weren’t doable—for now.")
 
