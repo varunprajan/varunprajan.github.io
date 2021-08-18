@@ -60,7 +60,7 @@ which is actually fairly straightforward. (Whether this is good enough for finan
 
 ## ETL, first attempt
 
-Our first attempt at an ETL script for this `historical_exchange_rates` table might look something like the Python code below. For brevity, I've omitted many of the details, but the entire script is available on Github [TODO]).
+Our first attempt at an ETL script for this `historical_exchange_rates` table might look something like the Python code below. For brevity, I've omitted many of the details, but these should be obvious to fill in.
 
 ```python
 import logging
@@ -236,4 +236,4 @@ What I like about this case study is that it is (deceptively) simple, yet it rev
 6. At some point, cron won't be good enough. Proper workflow management tools add immeasurable value by making recovering from failure straightforward and efficient (only failed tasks need to be retried, not the entire job).
 7. Upsertion is powerful way to write safe and correct data flows. It ensures that you never duplicate data, which is possible with append-based flows. Much more could be said about this topic, but I'd recommend reading the post by Maxime Beauchemin linked at the top to learn more about "functional data engineering" and "idemptotent" processes (of which upsertion is one).
 
-Let me know your thoughts! Both the first draft and final draft of the ETL script are available on GitHub [TODO], although the Airflow code/DAG is omitted.
+Let me know your thoughts!
