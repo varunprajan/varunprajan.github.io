@@ -215,7 +215,7 @@ def transform_data(raw_data_file: str) -> pd.DataFrame:
     [original transformation code]
 
     if "exchange_rate" in frame:
-        frame = frame.rename(columns={"exchange_rate": "exchange_rate_usd"})
+        frame = frame.rename(columns={"exchange_rate_usd": "exchange_rate"})
     if "base_currency_code" not in frame:
         frame["base_currency_code"] = "USD"
 
