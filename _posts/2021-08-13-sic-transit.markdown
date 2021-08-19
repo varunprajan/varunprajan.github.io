@@ -9,7 +9,7 @@ categories: jekyll update
 
 Data changes over time: old data sources are deprecated, new data sources are added, attributes are modified, event semantics and data models are evolved, and so on. How do we avoid the maintenance "tax" associated with keeping our downstream models, dashboards, and ad-hoc queries up-to-date with these changes?
 
-The solution is obvious conceptually, even if it is not obvious how to implement it. We need to create an interface for data access that differs from the data's underlying representation. This is much like how an API ("application programming interface") provides methods for interacting with a service that are logically separated from the computations occurring within the service itself. As a programmer, I do not care how the data for the exchange rate between US and Canadian dollars is stored, so long as I can retrieve it on a particular day. This provides the API developer the freedom to modify the data store without impacting the programmer's code. Quite similarly, we would like an interface for data access that a dashboard developer can use without needing to know about changes to data sources, data models, event semantics, etc.
+The solution is obvious conceptually, even if it is not obvious how to implement it. We need to separate the form of the data from its function: how the data is represented in a database from how it is accessed. This is much like how an API ("application programming interface") provides methods for interacting with a service that are logically separated from the computations occurring within the service itself. As a programmer, I do not care how the data for the exchange rate between US and Canadian dollars is stored, so long as I can retrieve it on a particular day. This provides the API developer the freedom to modify the data store without impacting the programmer's code. Quite similarly, we would like an interface for data access that a dashboard developer can use without needing to know about changes to data sources, data models, event semantics, etc.
 
 At this point, it is worth being somewhat more concrete, because the statements above are probably too broad and vague to be practically useful. Let's start with some definitions and distinctions.
 
@@ -27,7 +27,7 @@ What are our goals here?
 2. *Semantic data model changes*: We would like any changes that affect the semantics of the data model to be properly accounted for in the queries that the analytics team builds. In this case, we concede that we must make changes to our downstream queries, but the goal is to make this work as lightweight as possible.
 
 ### A case study
-Suppose we have a chess mobile app (such as [Really Bad Chess](http://reallybadchess.com/), which I highly recommend). Suppose the app makes money a player purchases lessons (on how to play chess really badly, presumably). We might imagine a transactions table that looks like this:
+Suppose we have a chess mobile app (such as [Really Bad Chess](http://reallybadchess.com/), which I highly recommend). Suppose the app makes money when a player purchases lessons (on how to play chess really badly, presumably). We might imagine a transactions table that looks like this:
 
 | player_id | event_at | lesson_id | revenue_usd |
 | :---------: | :------: | :-------: | :----: |
@@ -69,6 +69,7 @@ There are a few interrelated solutions to this problem.
 #### View layer
 Use a "view layer" on top of the raw table. _All_ queries, whether they are in dashboards, Jupyter notebooks, ML data preparation jobs, etc, should reference the view instead of the table itself. To repeat: no one should reference the raw data in the table. The view can encapsulate the logic for assigning defaults, renaming columns, dealing with backwards compatibility, etc. So, we might have something like (in dbt style):
 
+{% raw %}
 ```sql
 -- transactions_cleaned.sql
 {{
@@ -84,8 +85,9 @@ SELECT
     ,COALESCE(event_name, 'OldPurchase') AS event_name
 FROM {{ source('transactions') }}
 ```
+{% endraw %}
 
-By creating a single point of contact with the raw, granular data, we can avoid making changes to every single downstream query when simple, syntactic changes to the data model happen, such as column or data value renaming. (Of course, if we make _semantic_ changes to the data model, it is likely that many downstream queries will still need to be updated.)
+By creating a single point of contact with the raw, granular data, we can avoid making changes to every single downstream query when simple, syntactic changes to the data model happen, such as renaming of attributes or data values (like enums). (Of course, if we make _semantic_ changes to the data model, it is likely that many downstream queries will still need to be updated.)
 
 The view layer has an additional benefit: if we need to replace the underlying data source with a new one that is semantically equivalent, that becomes as simple as replacing `data_table_old` with `data_table_new` in the view layer, and none of the downstream queries need to know the difference.
 
@@ -128,6 +130,7 @@ The periods are not defined by `event_at::DATE`, for the reasons described above
 
 where, each time the analytics in the application code undergoes a semantic change, the `analytics_version` is bumped to the date of the release. With this, we can write our view layer as:
 
+{% raw %}
 ```sql
 -- transactions_cleaned.sql
 {{
@@ -145,6 +148,7 @@ SELECT
     ,COALESCE(analytics_version, '1970.01.01') AS analytics_version
 FROM {{ source('transactions') }}
 ```
+{% endraw %}
 
 and our desired query as:
 
@@ -155,10 +159,7 @@ SELECT
     ,SUM(
         CASE
             WHEN analytics_version < '2021.08.10' AND event_name = 'OldTransaction'
-                -- note: this is only approximate, because of the error
-                -- we might try applying a discount factor to the revenue,
-                -- based on the comparison of OldPurchase and ValidPurchase in period 2
-                -- in order to fix this
+                -- again, this is only approximate
                 THEN revenue_usd
             WHEN analytics_version >= '2021.08.10' AND event_name = 'ValidTransaction'
                 THEN revenue_usd
@@ -171,7 +172,7 @@ GROUP BY 1, 2
 ```
 
 #### Metrics layer
-There is still a problem: any time that we want to write a new query that involves the revenue, we need to copy this complicated "CASE/WHEN" logic into that query. Each different type of aggregation -- whether by player, or by lesson, or by player and lesson and date -- will require this logic. Thus, although we've solved the problem of computing the revenue, we've set ourselves up for a potential maintenance headache. Our code is the opposite of [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
+There is still a problem: any time that we want to write a new query that involves the revenue, we need to copy this complicated "CASE/WHEN" logic into that query. Each different type of aggregation -- whether by player, lesson, date, or combinations thereof -- will require this logic. Thus, although we've solved the problem of computing the revenue, we've set ourselves up for a potential maintenance headache. Our code is the opposite of [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
 
 There are a few ways to address this issue, although none of them seems particularly good to me. 
 
@@ -179,6 +180,7 @@ There are a few ways to address this issue, although none of them seems particul
 
 1. We can rewrite the `revenue_usd` column in the view, like so:
 
+{% raw %}
 ```sql
 {{
     config(materialized='view')
@@ -206,6 +208,7 @@ SELECT
     ,COALESCE(analytics_version, '1970.01.01') AS analytics_version
 FROM {{ source('transactions') }}
 ```
+{% endraw %}
 
 This strikes me as being wrong aesthetically, although I'm not able to fully articulate why. Moreover, it does not allow us to run the analysis comparing the revenue from the old and new events during period 2: the revenue from the former will be zeroed out.
 

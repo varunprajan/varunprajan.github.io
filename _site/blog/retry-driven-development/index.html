@@ -179,7 +179,7 @@
 </code></pre></div></div>
 <p>which is actually fairly straightforward. (Whether this is good enough for financial reporting is a separate issue that is out of scope for this post.)</p>
 <h2 id="etl-first-attempt">ETL, first attempt</h2>
-<p>Our first attempt at an ETL script for this <code>historical_exchange_rates</code> table might look something like the Python code below. For brevity, I've omitted many of the details, but the entire script is available on Github [TODO]).</p>
+<p>Our first attempt at an ETL script for this <code>historical_exchange_rates</code> table might look something like the Python code below. For brevity, I've omitted many of the details, but these should be obvious to fill in.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="p">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
 
@@ -288,7 +288,7 @@
     <span class="p">[</span><span class="n">original</span> <span class="n">transformation</span> <span class="n">code</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="s">"exchange_rate"</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
-        <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s">"exchange_rate"</span><span class="p">:</span> <span class="s">"exchange_rate_usd"</span><span class="p">})</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s">"exchange_rate_usd"</span><span class="p">:</span> <span class="s">"exchange_rate"</span><span class="p">})</span>
     <span class="k">if</span> <span class="s">"base_currency_code"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">frame</span><span class="p">:</span>
         <span class="n">frame</span><span class="p">[</span><span class="s">"base_currency_code"</span><span class="p">]</span> <span class="o">=</span> <span class="s">"USD"</span>
 
@@ -306,7 +306,7 @@
 <li>At some point, cron won't be good enough. Proper workflow management tools add immeasurable value by making recovering from failure straightforward and efficient (only failed tasks need to be retried, not the entire job).</li>
 <li>Upsertion is powerful way to write safe and correct data flows. It ensures that you never duplicate data, which is possible with append-based flows. Much more could be said about this topic, but I'd recommend reading the post by Maxime Beauchemin linked at the top to learn more about &quot;functional data engineering&quot; and &quot;idemptotent&quot; processes (of which upsertion is one).</li>
 </ol>
-<p>Let me know your thoughts! Both the first draft and final draft of the ETL script are available on GitHub [TODO], although the Airflow code/DAG is omitted.</p>
+<p>Let me know your thoughts!</p>
 
   </div><a class="u-url" href="/blog/retry-driven-development/" hidden></a>
 </article>
