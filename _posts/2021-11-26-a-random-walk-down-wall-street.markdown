@@ -1,14 +1,12 @@
 ---
 layout: post
 title:  "A random walk down Wall Street"
-date:   2021-08-13 23:07:59 -0500
+date:   2021-11-26 23:07:59 -0500
 categories: jekyll update
 mathjax: true
 ---
 
 ## Introduction
-
-
 
 
 
