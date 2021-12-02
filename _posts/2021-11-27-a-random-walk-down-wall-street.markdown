@@ -62,6 +62,17 @@ Other rulesets are possible for options. The disadvantage of the one under consi
 
 For the initial allocation decision, I will assume a few different possibilities, summarized in the table below:
 
+| Allocation Type | Cash | RSUs | ATM Options | OTM Options |
+|-----------------|------|------|-------------|-------------|
+| Cash only       | 1    | 0    | 0           | 0           |
+| RSUs only       | 0    | 1    | 0           | 0           |
+| ATM only        | 0    | 0    | 1           | 0           |
+| OTM only        | 0    | 0    | 0           | 1           |
+| Default         | 0    | 0.75 | 0.25        | 0           |
+| RSUs + Cash     | 0.5  | 0.5  | 0           | 0           |
+| RSUs + Options  | 0    | 0.5  | 0.25        | 0.25        |
+| Even            | 0.25 | 0.25 | 0.25        | 0.25        |
+
 ### Python code
 
 The python code to run the simulation and model the payouts is presented below. The version I present is vectorized, which makes the computation faster but also perhaps less readable. Note that, in general, it's easier to program these simulations step-by-step (advancing from $t$ to $t+1$), but this may less computationally efficient.
@@ -246,3 +257,7 @@ To conclude:
 5. There were many dubious assumptions made (neglecting taxation, assuming a geometric Brownian motion model for stock prices, settling on a simple-to-code but suboptimal strategy for exercising options, etc.), so this should not be taken as a final word on this problem. Indeed, the purpose was more to show an example of the Monte Carlo simulation technique than to decide on an "optimal" allocation ruleset for me.
 
 (For those who are curious, I plan to put the vast majority of my equity into RSUs; given my risk aversion, this decision makes more sense than the default allocation (75% RSUs, 25% ATM options), and RSUs are superior to cash even under somewhat pessimistic growth assumptions. That being said, I took the analysis above as more of a guide than anything else; I did not try to "argmax" my way to a decision.)
+
+## Addendum
+
+The Jupyter notebook used to run the simulations, generate the plots, etc. is provided [here](https://github.com/varunprajan/data-eng-blog/tree/main/a-random-walk-down-wall-street)
