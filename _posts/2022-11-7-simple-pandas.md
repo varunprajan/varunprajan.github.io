@@ -50,11 +50,11 @@ There are two types of operations, those at the dataframe level, and those at th
 | — (many, such as `CONCAT` or `LIKE`) | Manipulating strings | `.str` |  |
 | — (many, such as `AND` OR `NOT`) | Logical operators on boolean series | `&`, `~`, `\|`, etc.
 
-### The Workhorse Methods
+## The Workhorse Methods
 
 In total, there are 15 methods that operate at the level of the dataframe, of which 4 are what I term the “workhorse” methods: `assign`, `query`, `merge`, and `groupby`.
 
-### `assign`
+### Assign
 
 `assign` takes a dataframe and returns a dataframe. It should be used for *assigning* the results of simple transformations (bucketing data, concatenating strings, ensuring correct types, etc.) to new columns. Some examples:
 
@@ -87,7 +87,7 @@ new_frame = frame.assign(
 )
 ```
 
-### `query` 
+### Query 
 
 `query` also takes a dataframe and returns a dataframe. It is used to filter down data; to keep rows that are relevant and discard those that aren’t. Some examples:
 
@@ -117,7 +117,7 @@ new_frame = (
 )
 ```
 
-### `groupby`
+### Groupby
 
 `groupby.agg` and `groupby.transform` can be used to group a dataframe by one or more columns. 
 
@@ -159,7 +159,7 @@ agg_frame = (
 )
 ```
 
-### `merge`
+### Merge
 
 `merge` does the equivalent of a SQL join on two dataframes. There are some limitations compared to SQL (for instance, *in*equality joins are not allowed), but the core functionality is the same. It is useful to explicitly specify the join type using the `how` keyword arg (the default is “inner”). Some examples:
 
@@ -204,11 +204,11 @@ There are a number of other methods that operate at the level of the series. As 
 
 All-in-all, there are some ~20-30 methods to know, and ~4 to know very well, which is not too bad as far as a “simple” vocabulary goes!
 
-### Best Practices and Idioms
+## Best Practices and Idioms
 
-1. Build up your transformed data as a sequence of simple transformations. This will look like a long chain of `.` methods—or “method chaining”, if you want to sound fancy—applied to the dataframe, like:
+* Build up your transformed data as a sequence of simple transformations. This will look like a long chain of `.` methods—or “method chaining”, if you want to sound fancy—applied to the dataframe, like:
 
-```jsx
+```python
 duplicate_names = (
     frame
     .assign(
@@ -221,13 +221,13 @@ duplicate_names = (
 )
 ```
 
-(If you’re curious, this code takes a dataframe of first and last names and generates a list of full names that appear twice. The same could be done with `.drop_duplicates`, of course.)
+(If you’re curious, this code takes a dataframe of first and last names and generates a list of full names that appear twice. The same could be done with `.drop_duplicates`, the equivalent of SQL `DISTINCT`, of course.)
 
 Setting the specifics aside, the key point is that we start with a dataframe and arrive at our final answer using a sequence of small “pure” transformations.
 
-1. Use a code formatter like `black` to make your code more readable. `black` also integrates with Jupyter notebooks via a Jupyter extension; see [here](https://github.com/drillan/jupyter-black).
-2. Never use the `inplace=True` version of operations; always use the operation to create a new, modified dataframe. In other words, prefer code like `frame = frame.reset_index()` to `frame.reset_index(inplace=True)`
-3. Defining your own functions to DRY repetitive transformations is recommended; make sure these take a dataframe (as the first argument) and return a dataframe, like the operations discussed above do. The `.pipe` operator can be used to retain “method chaining”. As an example:
+* Use a code formatter like `black` to make your code more readable. `black` also integrates with Jupyter notebooks via a Jupyter extension; see [here](https://github.com/drillan/jupyter-black).
+* Never use the `inplace=True` version of operations; always use the operation to create a new, modified dataframe. In other words, prefer code like `frame = frame.reset_index()` to `frame.reset_index(inplace=True)`
+* Defining your own functions to DRY repetitive transformations is recommended; make sure these take a dataframe (as the first argument) and return a dataframe, like the operations discussed above do. The `.pipe` operator can be used to retain “method chaining”. As an example:
 
 ```python
 def my_value_counts(frame, group_cols):
@@ -247,10 +247,10 @@ frame_with_value_counts = (
 )
 ```
 
-1. Ignore the index of the dataframe, for the most part. The only exception is that `groupby.agg` and `pivot_table` (which does a `groupby` under the hood) unfortunately create a new index, which should be destroyed with `reset_index`. Clever use of the index sometimes makes data transformations more performant (e.g., fast lookups), but for 95% of work I find it unnecessary.
-2. Always pay attention to the granularity or “grain” of the dataframe. This is essentially the combination of columns that provides a unique id for each row. Most operations keep the grain intact. `groupby.agg` and `pivot_table`  are important exceptions: they allow you to “coarsen” the grain of the dataframe.
+* Ignore the index of the dataframe, for the most part. The only exception is that `groupby.agg` and `pivot_table` (which does a `groupby` under the hood) unfortunately create a new index, which should be destroyed with `reset_index`. Clever use of the index sometimes makes data transformations more performant (e.g., fast lookups), but for 95% of work I find it unnecessary.
+* Always pay attention to the granularity or “grain” of the dataframe. This is essentially the combination of columns that provides a unique id for each row. Most operations keep the grain intact. `groupby.agg` and `pivot_table`  are important exceptions: they allow you to “coarsen” the grain of the dataframe.
 
-### A Worked Example
+## A Worked Example
 
 We run a lot of experiments at my company, and sometimes I want to analyze the results outside of our experimentation platform for the purpose of generating hypotheses (i.e., not to show something is statistically significant)
 
