@@ -1,12 +1,10 @@
-## Reflections on data science in big tech
-
 Data science is an infamously nebulous term. It can, depending on the organization, involve building dashboards, writing data pipelines, developing metrics, conducting causal inference analyses, doing ad-hoc analytics work, pulling numbers for stakeholders who don’t know SQL, building ML models offline, deploying those ML models to production, writing data tests and monitoring data “drift”, running A/B tests, or simply being a more quantitatively-minded PM.
 
 At “big tech” companies, however, the term is somewhat less vague — particularly if we focus our attention on “product data scientists” (as opposed to, say, marketing, ads, or other activities). In my brief (2 year) stint at Spotify, I was a product data scientist. I supported an engineering team that made new playlists and better versions of existing ones. More generally, here is my definition of what product data scientists do: they use quantitative methods (analytics, statistics, and, occasionally, machine learning) to help their engineering and product partners launch “better” products on a faster timeline.
 
 I have an embarrassing admission to make, though. Much of my time at Spotify was not spent doing those things! And this is not because I was particularly bad at my job. I think the same statement can be made about many of my colleagues. Avoiding these mistakes is the key to becoming a great product data scientist.
 
-### Replacement-level
+## Replacement-level
 
 There is a concept in baseball analytics/sabermetrics known as [“WAR”: “wins above replacement”](https://www.washingtonpost.com/news/fancy-stats/wp/2017/11/20/bill-james-who-spurred-baseballs-analytics-revolution-is-waging-a-mini-war-on-war/). It tries to quantify how valuable a player is to a team, as compared to an average, or “replacement-level”, player. Most players, of course, are valuable in some absolute or objective sense. Having them is better than having no one at all. But many players are not valuable in a relative, or “replacement-adjusted” sense. They do not generate an extra hit, RBI, defense play, etc. over what a mediocre replacement would do.
 
@@ -30,11 +28,11 @@ The earlier a data scientist can enter into the cycle of “hypothesis generatio
 
 I want to spend some time on that last point. At most companies, individual contributors are incentivized away from doing “local” work — work focused on their immediate team — and incentivized towards doing “global” work — work focused on making other practitioners in their field better, or helping their department or company at large. In fact, it is often a hard requirement for a “staff level” promotion that the individual contributor has demonstrated broad impact, and has developed some tool that people across the organization use. Naturally, as a data scientist trying to get promoted, you might gravitate towards building such tools instead of helping your immediate team run better tests and make better decisions. After all, it is rare that a well-run A/B test (or, even better, an A/B test that you *avoided* running) makes it into your promotion packet. But, in my view, this is one of the preeminent signs of a “high WAR” product data scientist. There is often no good way to resolve the tension between the work you should be doing, for the sake of the business, and the work you feel compelled to do, for the sake of your career. My (dismal) advice is that, if you are in such a situation and feel at a dead-end, you should leave for another job.
 
-### Above replacement-level
+## Above replacement-level
 
 If data scientists shouldn’t be mired in replacement-level activities, what should they be doing instead, or in addition? Below, I share three ideas from my experience at Spotify.
 
-#### Inform product and testing strategy
+### Inform product and testing strategy
 
 As I argued above, data scientists are uniquely equipped to contribute to the product and testing strategy. They should not simply run post-hoc test analyses; they should also advocate for which tests should be run, and which ones shouldn’t be. Data scientists should also remember that they are not simply another voice in the room: between product managers, mid-level managers, product directors, and company leadership, there are already enough (too many?) of those. Instead, a data scientist should use their unique combination of skills — business/domain knowledge, quantitative research, and experimentation strategy — to influence the product and testing roadmap.
 
@@ -47,7 +45,7 @@ Many tests that are run, and feature iterations that are worked on, are unlikely
     1. If we know that certain pairs of metrics are *causally* related — for example, if we understand the relationship between listening time and retention, or lifetime value — then we might be able to make even stronger statements about how a particular change will affect business goals (again, before the test is run). We might realize, for example, that the current level of boosting will unduly harm our revenue, and recalibrate it instead of wasting a cycle of testing.
     2. Data scientists can play a role both in creating the ML model, as well as in establishing the relationships between metrics (using techniques like “[causal meta-mediation analysis](https://dl.acm.org/doi/10.1145/3394486.3403313)”).
 
-#### Own data, end-to-end
+### Own data, end-to-end
 
 Someone at the company should understand how a metric is computed, from end-to-end. Often this knowledge is possessed in patchwork. Client or backend engineers instrument the raw events; data engineers ingest these into a data lake, and perhaps lightly massage them; analytics engineers create domain-specific aggregations, like dimension and fact tables; and data scientists stand atop these efforts and generate the final metric. But this leads to what I’ll call the “[Rumsfeld problem](https://www.goodreads.com/quotes/1215538-you-go-to-war-with-the-army-you-have-not)”: you do the analysis with the data you have, not the data you might want or wish to have at a later time. A related problem is that, if your data begins to look suspicious, you have no idea why or how to fix it.
 
@@ -59,7 +57,7 @@ Data scientists should also be interested in data even further “upstream”. A
 
 Once again, none of this is costless. Analytics and data engineering is a full-time job, and “normal” data science work is already quite a lot. So why do I think data scientists should invest in these activities? Quite simply, it is difficult to be confident in the rigor and quality of analyses, A/B test results, and dashboards, without having confidence in their underlying datasets. And, as I mentioned previously, the tables that will help you do your analysis most efficiently are rarely *just there*, fully-formed, like [Venus on the half-shell](https://en.wikipedia.org/wiki/The_Birth_of_Venus). You will likely have to make them.
 
-#### Understand the user and advocate for them
+### Understand the user and advocate for them
 
 No one who works at a company is a dispassionate observer. Product managers want their ideas to succeed, and their trajectory at the company often hinges on the success of the features they foster. Engineers want the features they build to be adopted into the product, as opposed to unceremoniously canned after a failed A/B test. “Researchers” — a group that includes data scientists — are by no means unbiased, but we should aspire to be advocates for the user, not the feature. (We are often the only ones.)
 
@@ -69,7 +67,7 @@ A better approach is to partner with user research to develop a mental model for
 
 Most importantly, research can illuminate the gap between the grand ambitions of PMs and directors and the harsh realities of development of new features. At Spotify, I witnessed the launch of several features that would supposedly transform the app: the [home redesign](https://www.theverge.com/2023/3/8/23630821/spotify-design-home-music-podcasts-audiobooks-app), the [AI DJ](https://newsroom.spotify.com/2023-02-22/spotify-debuts-a-new-ai-dj-right-in-your-pocket/), [audiobooks](https://newsroom.spotify.com/2023-10-03/audiobooks-included-in-spotify-premium/), and so on. These launches often had outsized expectations and correspondingly outrageous metrics targets. Research was usually the first discipline to highlight the disparity between expectation and reality, and to prove that what we had built was not as “revolutionary” as we had intended.
 
-### Conclusion
+## Conclusion
 
 This has been a long post, but hopefully not too long-winded. What I want to leave you with is this. Product data science, much like Spotify feature launches, has suffered from its own “expectations gap”. The ambition for product data science is that it suffuses and transforms the product strategy. The reality is that we spend much of our time analyzing tests that should not have been run and generating reports that only confirm everyone’s pre-existing thinking. To bridge this gap requires a lot of work: becoming a co-equal partner with product (which typically requires at least partial embedding), investing in data quality and usability, and understanding what the user really thinks. 
 
