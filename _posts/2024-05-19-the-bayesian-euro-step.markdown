@@ -234,7 +234,7 @@ What have we learned?
 
 Somewhere along the way, we also lost the idea of the “null hypothesis”. This was always an abstraction (can the effect size really be exactly zero?), but let’s try to add it back in.
 
-To do this, let’s *combine* NHST and Bayesian ideas. Instead of having the prior distribution be Gaussian, we have it be “two spikes”: one spike at 0, for the null hypothesis, and the other spike at the MDE, for the alternate hypothesis. The distribution overall must have a probability mass of 1, so each spike will have a weight ($w_{null}$, $w_{alt}$) that sums to 1.
+To do this, let’s *combine* NHST and Bayesian ideas. Instead of having the prior distribution be Gaussian, we have it be “two spikes”: one spike at 0, for the null hypothesis, and the other spike at the MDE, for the alternate hypothesis. The distribution overall must have a probability mass of 1, so each spike will have a weight $w$ ($w\_{null}$, $w\_{alt}$) that sums to 1.
 
 So, our Monte Carlo simulation now looks like this:
 
