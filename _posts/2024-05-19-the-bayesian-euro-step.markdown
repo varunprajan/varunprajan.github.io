@@ -28,8 +28,7 @@ As I mentioned before, this is where the “Euro step” comes in. Instead of fo
 
 You might remember from statistics class that “inverting” statements about probabilities requires Bayes’ theorem. This is the “Bayesian” part of the “Bayesian Euro step”. Practitioners of the Euro step will suggest applying Bayes’ theorem to statistical testing and the interpretation of p-values. For example, here’s Harlan Harris:
 
-> As I [discussed previously](https://www.harlan.harris.name/2022/08/communicating-a-b-test-results-for-conversion-rates-with-ratios-and-uncertainty-intervals/), although in *general* *p* < 0.05 does not mean “95% likely to be better”, in the very simple case of a *t* test for a properly-executed A/B test with adequate
-power, it’s very close, and certainly adequate to mean “almost certainly better”.
+> As I [discussed previously](https://www.harlan.harris.name/2022/08/communicating-a-b-test-results-for-conversion-rates-with-ratios-and-uncertainty-intervals/), although in *general* *p* < 0.05 does not mean “95% likely to be better”, in the very simple case of a *t* test for a properly-executed A/B test with adequate power, it’s very close, and certainly adequate to mean “almost certainly better”.
 > 
 
 > [Before certain statisticians](https://www.harlan.harris.name/2022/08/communicating-a-b-test-results-for-conversion-rates-with-ratios-and-uncertainty-intervals/) in the audience write angry comments, I’m well aware that interpreting frequentist intervals correctly requires some hair-splitting language, and that Bayesian credible intervals are more directly tied to peoples’ intuitions. As it turns out, though, in practice at the scale that most web A/B tests run, there’s no practical difference. You can interpret frequentist [confidence] intervals such as the above as if they were Bayesian [credible intervals], and describe them the “wrong way”, as if they were saying something about the beliefs you should have about the true values.
@@ -39,7 +38,7 @@ power, it’s very close, and certainly adequate to mean “almost certainly bet
 
 That was a bunch of jargon, some of which you might not have understood. But the basic idea is that, through some magic (Bayes’ theorem), we can generate “Bayesian credible intervals”. These are not the “confidence intervals” from traditional NHST, although they can be very similar. Bayesian credible intervals capture the distribution of the true effect. There is a 95% chance that the true effect lies within the interval. And, if the credible interval is relatively narrow (which requires an A/B test with a large sample size), we can make very strong statements. Examples are: “it is 98% likely that the effect was positive, and the treatment was better than the control” or “it is 92% likely that the estimated benefits of shipping the treatment cell are larger the costs”.
 
-Unfortunately, in statistics as in many other disciplines, there is no free lunch. Going from typical NHST outputs (p-values and confidence intervals) to Bayesian results (credible intervals, posterior distributions of the effect) requires some assumptions. The biggest one is the prior. This embodies our prior beliefs about the effect: that is, prior to the A/B test launching. Harlan Harris mentioned this in passing, saying “our prior is relatively broad”. But why? And what if that assumption doesn’t hold?
+Unfortunately, in statistics as in many other disciplines, there is no free lunch. Going from typical NHST outputs (p-values and confidence intervals) to Bayesian results (credible intervals, posterior distributions of the effect) requires some assumptions. The biggest one is the prior. This embodies our prior beliefs about the effect: that is, prior to the A/B test launching. Bayesian analysis involves combining our prior beliefs with the data from the A/B test to construct a "posterior" distribution. Harlan Harris mentioned the prior in passing, saying “our prior is relatively broad”. But why? And what if that assumption doesn’t hold?
 
 (As a slight digression, I’ll also mention another assumption, often glossed over, that is important for both NHST and Bayesian interpretation: “adequate power”. While the excerpt above mentions that this assumption is met “at the scale that most web A/B tests run”, I think this statement is too strong. An A/B test can have adequate power for some metrics (proxy metrics) but not others (business guardrails). There can be business constraints (e.g., A/B test runtime) or competing experiments that reduce sample size. And there are often other subtle considerations, like the fact that for very large companies, even very small relative effects, which are hard to power, can be materially important, and large effects become increasingly hard to generate as a product matures. I would argue many, if not most, web/tech companies struggle with power, and this problem is not confined to the social sciences, as we might like to believe.)
 
@@ -182,11 +181,13 @@ The last line is the fraction of times that we get a stat-sig result. In the not
 
 ### Applying the simulations to the Bayesian Euro step
 
-Now that we’ve confirmed the simulation is working as intended, let’s apply it to the Bayesian framework for interpreting A/B tests.
+Now that we’ve confirmed the simulation is working as intended, let’s apply it to the Bayesian framework for interpreting A/B tests. We'll consider the three priors pictured schematically, below. (I'll explain what each of these are, in turn.)
+
+![Bayesian priors](/assets/img/bayesian_priors.png "Bayesian priors for A/B testing")
 
 First, let’s check Harlan Harris’s statement that, with a “broad” prior, obtaining a stat-sig result under NHST implies very strongly that the true effect is larger than 0.
 
-We can run the simulation first with a “broad” prior to specify the effect:
+To implement this, we set our prior as a Gaussian distribution with a standard deviation much larger than the minimum detectable effect (MDE), as pictured above.
 
 ```python
 n_trials = 10_000
@@ -207,7 +208,7 @@ for i in range(n_trials):
 frame_broad = pd.DataFrame(results)
 ```
 
-Then, after limiting to stat-sig results, we can calculate the probability that the true effect was greater than 0
+Then, we can calculate the probability that the true effect was greater than 0, given that the result was statistically significant.
 
 ```python
 (
@@ -221,20 +222,20 @@ Then, after limiting to stat-sig results, we can calculate the probability that 
 )
 ```
 
-I get an extremely large number: 99.95%. So it is extremely unlikely we are making a “type I error” if we find statistical significance, assuming a broad prior.
+I get an extremely large number: 99.95%. So, assuming a broad prior, it is extremely unlikely we are making a “type I error”: falsely assuming the effect was positive when it was actually neutral or negative.
 
-At this point, though, you might notice something strange: the probability of a statistically significant result itself is very large. Out of the 10,000 trials we ran, close to 4950 (or, almost half) are statistically significant. In fact, this is not too surprising. Because the prior is so broad, if the effect is positive at all (which happens half the time), it is very likely to be large enough that it is statistically significant (again, assuming adequate power).
+At this point, though, you might notice something strange: the probability of a statistically significant result _itself_ is very large. Out of the 10,000 trials we ran, close to 4950 (or, almost half) are statistically significant. In fact, this is not too surprising. Because the prior is so broad, if the effect is positive at all (which happens half the time), it is very likely to be large enough that it is statistically significant (again, assuming adequate power).
 
-What if we choose a prior that is much less broad? If we repeat the calculation above with a prior that has a standard deviation of 0.01 (so, less than the effect size we care about), the “99.95%” number becomes “87%”. So, there is a 13% chance we’re making a bad decision: significantly larger than the 5% that we’d originally thought. Also, the probability of a statistically significant result goes down too, from 49.5% to 4%.
+What if we choose a prior that is much less broad? We can repeat the calculation above with a "narrow" prior (again, see image above). Here, we'll set the standard deviation to 0.01 --- much less than the MDE. With this choice, the Monte Carlo simulations show that the “99.95%” number becomes “87%”. Now, there is a 13% chance we’re making a bad decision: much larger than the 2.5% that we’d originally thought from our value of "alpha" (dividing by two since we're doing a one-sided test). Also, the probability of a statistically significant result has gone down, from 49.5% to 4%.
 
 What have we learned?
 
 1. Our results seem to have strong “sensitivity” to the prior: they depend a lot on what the prior is, and, in particular, how broad it is.
-2. It is hard to justify the assumption of a broad or “uninformative” prior. We cannot say the results don’t depend on the prior, so that we can simply choose an arbitrary one. And we also cannot say that the results for a broad prior agree with intuition. It seems implausible that the true effect sizes are really as large as a broad prior implies, or that we should expect a statistically significant result close to 100% of the time (for a two-sided test)
+2. It is hard to justify the assumption of a broad or “uninformative” prior. The results obviously depend on the prior; we cannot simply choose an arbitrary one. At the same time, the results for a broad prior do not agree with intuition either. It seems implausible that the true effect sizes are really as large as a broad prior implies, or that we should expect a statistically significant result close to half the time (for a one-sided test)
 
 Somewhere along the way, we also lost the idea of the “null hypothesis”. This was always an abstraction (can the effect size really be exactly zero?), but let’s try to add it back in.
 
-To do this, let’s *combine* NHST and Bayesian ideas. Instead of having the prior distribution be Gaussian, we have it be “two spikes”: one spike at 0, for the null hypothesis, and the other spike at the MDE, for the alternate hypothesis. The distribution overall must have a probability mass of 1, so each spike will have a weight ($w_{null}$, $w_{alt}$) that sums to 1.
+To do this, let’s *combine* NHST and Bayesian ideas. Instead of having the prior distribution be Gaussian, we have it be “two spikes”: one spike at 0, for the null hypothesis, and the other spike at the MDE, for the alternate hypothesis. (Again, see schematic above.) The distribution overall must have a probability mass of 1, so each spike will have a weight $w$ ($w\_{null}$, $w\_{alt}$) that sums to 1.
 
 So, our Monte Carlo simulation now looks like this:
 
@@ -273,7 +274,7 @@ Here are the numbers I get for one run, with $w_{null}$ ranging over the values 
 
 (It turns out that, for the two spike prior, you can use Bayes theorem directly and recover basically the same posterior probabilities. See [here](https://bit.ly/ABTestingIntuitionBusters) for more details.)
 
-As the prior probability of the null hypothesis (the first column) increases, the probability of making a false positive judgment (the second column) also increases. The statement that “p < 0.05” means “95% likely to better” (assuming adequate power, etc.) **is only true if the null hypothesis is not very likely**.
+As the prior probability of the null hypothesis (the first column) increases, the probability of making a false positive judgment (the second column) also increases. The statement that “p < 0.05” means “95% likely to better” (assuming adequate power, etc.) **is only true if the null hypothesis is not very likely**. This also explains the results for the broad prior: it implicitly assumes the null hypothesis is not likely, and that large effects are commonly seen.
 
 ## Interpretation and wrap-up
 
@@ -295,4 +296,4 @@ Given the assumption that only 10-15% of A/B tests are successful, the “false 
 
 Indeed, I feel that Bayesian A/B test interpretation that assumes a broad prior **veers into the realm of bullshit**. (This is like how the Bayesian Euro step can easily turn into “travelling”.)  It is not enough to say “the prior is broad”; there has to be some meta-justification for this assumption. One case in which this assumption might be warranted is for certain types of A/B tests, where we are trying something new and there is a rough equivalence between treatment and control cells. (Harlan Harris calls these “[agnostic](https://www.harlan.harris.name/2023/07/the-five-types-of-a-b-test-decisions/)” tests.) For example, choosing the color for a new button on a website. But these examples are rare and are certainly not representative of most A/B tests.
 
-In most cases, I would advise either doing NHST with parameters even more restrictive than alpha = 0.05 and power = 80% (like Kohavi advises — e.g., alpha = 0.01 or 0.005), or doing the Bayesian Euro step with a prior probability of the null hypothesis of 85-90%, or perhaps a value you've obtained from your own meta-analysis on a sample of relevant experiments. Neither of these is equivalent to the broad prior, and the results obtained from that assumption will likely underestimate the true “false positive risk” and overestimate the true effects.
+In most cases, I would advise either doing NHST with parameters even more restrictive than alpha = 0.05 and power = 80% (like Kohavi advises — e.g., alpha = 0.01 or 0.005), or doing the Bayesian Euro step with a prior probability of the null hypothesis of 85-90%, or perhaps a value you've obtained from your own meta-analysis on a sample of relevant experiments. Neither of these is equivalent to the broad prior, and the results obtained from that assumption will likely underestimate the actual “false positive risk” and overestimate the actual effects.
