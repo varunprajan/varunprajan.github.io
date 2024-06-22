@@ -1,3 +1,10 @@
+---
+layout: post
+title:  "How to find the sample size for an A/B test"
+date:   2024-06-21 23:07:59 -0500
+categories: jekyll update
+---
+
 ## Introduction
 
 This post could be one sentence. I could tell you to use a sample size calculator (e.g., [Evan Miller’s Sample Size Calculator](https://www.evanmiller.org/ab-testing/sample-size.html)), plug in the relevant values (conversion rate, minimum detectable effect, alpha, power), copy the result, and paste it into your A/B test brief. Borrowing from quantum mechanics, we might call this approach “[shut up and calculate](https://en.wikiquote.org/wiki/Shut_up_and_calculate)”. I have no real objections to it, but it doesn’t make for terribly interesting content.

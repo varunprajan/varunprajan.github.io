@@ -1,3 +1,10 @@
+---
+layout: post
+title:  "Simple pandas"
+date:   2022-11-07 23:07:59 -0500
+categories: jekyll update
+---
+
 ## Introduction
 
 Simple English is a simplified version of English, typically limited to a vocabulary of \~1500 words or fewer. It is intended for students and others new to English. English, infamously, has many related (but subtly different) words for the same concept, and Simple English intends to cut through this redundancy. At the cost of economy of expression (and some beauty), we get a language that is much easier to read and to learn than English proper. Compare, for example, the [Wikipedia page](https://en.wikipedia.org/wiki/Calculus) on calculus with the [Simple Wikipedia page](https://simple.wikipedia.org/wiki/Calculus).

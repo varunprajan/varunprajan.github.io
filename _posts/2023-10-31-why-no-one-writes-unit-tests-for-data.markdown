@@ -1,3 +1,9 @@
+---
+layout: post
+title:  "Why no one writes unit tests for data"
+date:   2023-10-31 23:07:59 -0500
+categories: jekyll update
+---
 
 ## Introduction
 
