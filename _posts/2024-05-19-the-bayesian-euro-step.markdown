@@ -1,3 +1,10 @@
+---
+layout: post
+title:  "The Bayesian Euro step"
+date:   2024-05-19 23:07:59 -0500
+categories: jekyll update
+---
+
 ## Introduction
 
 Null hypothesis significance testing (NHST) is a notoriously tricky topic, and, even now, I find myself fumbling when trying to answer the question “what does a p-value from an A/B test really mean?”
@@ -235,7 +242,7 @@ What have we learned?
 
 Somewhere along the way, we also lost the idea of the “null hypothesis”. This was always an abstraction (can the effect size really be exactly zero?), but let’s try to add it back in.
 
-To do this, let’s *combine* NHST and Bayesian ideas. Instead of having the prior distribution be Gaussian, we have it be “two spikes”: one spike at 0, for the null hypothesis, and the other spike at the MDE, for the alternate hypothesis. (Again, see schematic above.) The distribution overall must have a probability mass of 1, so each spike will have a weight $w$ ($w\_{null}$, $w\_{alt}$) that sums to 1.
+To do this, let’s *combine* NHST and Bayesian ideas. Instead of having the prior distribution be Gaussian, we have it be “two spikes”: one spike at 0, for the null hypothesis, and the other spike at the MDE, for the alternate hypothesis. (Again, see schematic above.) The distribution overall must have a probability mass of 1, so each spike will have a weight \\(w \\) \\( (w\_{null}, w\_{alt}) \\) that sums to 1.
 
 So, our Monte Carlo simulation now looks like this:
 
@@ -264,7 +271,7 @@ frame_two_spikes = pd.DataFrame(results)
 
 We want to figure out the probability the null hypothesis is true, given we have a statistically significant result. This is the “inverse” probability we care about.
 
-Here are the numbers I get for one run, with $w_{null}$ ranging over the values 0.1, 0.5, and 0.9:
+Here are the numbers I get for one run, with \\(w_{null} \\) ranging over the values 0.1, 0.5, and 0.9:
 
 | P(null), prior | P(null \| stat-sig result), posterior |
 | --- | --- |
