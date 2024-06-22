@@ -21,7 +21,7 @@ Let’s start with something simpler, though. Suppose we just want to estimate t
 
 $$\text{SE} = \sqrt{\frac{p (1-p)}{n}}$$
 
-Here, $p$ is the proportion (the conversion rate), and $n$ is the sample size.
+Here, \\(p\\) is the proportion (here, the conversion rate), and \\(p\\) is the sample size.
 
 (I’ve taken this formula, and the ones that follow, from Gelman and Hill’s excellent book, Data Analysis Using Regression and Multilevel/Hierarchical Models, specifically [Chapter 20](http://www.stat.columbia.edu/~gelman/stuff_for_blog/chap20.pdf))
 
