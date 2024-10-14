@@ -49,7 +49,7 @@ To sum up:
 1. Trying to reformulate *implicitly* quantitative claims into *explicitly* quantitative ones is a useful exercise. It often reveals subtleties, like the exact groups being compared, whether these comparisons are descriptive or counterfactual, and the type of claim being made (causal or descriptive).
 2. Doing this reformulation isn’t trivial, especially for casual readers of the news. It requires digging into the text and, often, the references as well. We should not expect everyone to “do their own research”, and I would hope journalists would communicate more clearly.
 
-Readers of this blog presumably have higher standards. We would like to know not just *what* the quantitative claims are, but also whether they are **meaningful**. How might we do that?
+Readers of this blog presumably have higher standards than casual NYT readers. We would like to know not just *what* the quantitative claims are, but also whether they are **meaningful**. How might we do that?
 
 ## A framework
 
