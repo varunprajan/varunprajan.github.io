@@ -112,7 +112,7 @@ In the alcohol-health study, the authors fit a regression model with many covari
 
 Both the non-representativeness of the data (”high proportion of White participants”) and possible model misspecification (“residual confounding”) increase the uncertainty of the effect size estimates.
 
-The big problem with the “other uncertainty” category is that it is difficult to estimate by how much the uncertainty increases, and by how much our confidence should deteriorate. We typically struggle to estimate the changes caused by unmeasurable or unknown confounders.
+The big problem with the “other uncertainty” category is that it is difficult to estimate by how much the uncertainty increases, and by how much our confidence should deteriorate. We typically struggle to estimate the effects of unmeasurable or unknown confounders.
 
 ## Wrap-up
 
