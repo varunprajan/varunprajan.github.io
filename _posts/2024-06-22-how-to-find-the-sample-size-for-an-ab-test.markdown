@@ -47,7 +47,7 @@ where the subscripts \\(C\\) and \\(T\\) denote the control and treatment cells,
 
 Again, let’s suppose \\(p_C\\) and \\(p_T\\) are small. Then, this formula reduces to:
 
-$$n = 31.36 \left(\frac{p_{avg}}{p_C − p_T} \right)^2$$
+$$n = 31.36 p_{avg} \left(\frac{1}{p_C − p_T} \right)^2$$
 
 where \\(p_{avg} \\) is the average of \\(p_C\\) and \\(p_T\\).  Structurally this formula is very similar to the one we found above. The sample size scales linearly with the proportion we’re measuring, and inverse quadratically with the difference in proportions between treatment and control.
 
@@ -55,11 +55,13 @@ If we want to measure small differences between treatment and control — small 
 
 Let’s follow the logic of “relative effect sizes” further. Call the minimum effect size we want to detect the “MDE”, and express it in relative terms. Then the sample size formula becomes
 
-$$n = \frac{31.36 p_{avg}^2}{\text{MDE} \cdot p_{avg}} = \frac{31.36}{\text{MDE}^2 \cdot p_{avg}}$$
+$$n = \frac{31.36 p_{avg}}{\left(\text{MDE} \cdot p_{avg} \right)^2} $$
 
-Multiplying on both sides by pavg, we find:
+Multiplying on both sides by \\p_{avg}\\, we find:
 
-$$ n \cdot p_{avg} = \frac{31.36}{\text{MDE}^2} $$
+$$ n \cdot p_{avg} = n_{\text{successes}} = \frac{31.36}{\text{MDE}^2} $$
+
+## The law of successes
 
 The quantity on the left hand side is the sample size times the proportion: the number of “successes”. If the proportion is the conversion rate, this is just the number of conversions during the experiment. If the proportion is the clickthrough rate, this is the number of clickthroughs. I’ll call this equation the **“law of successes”**: measuring a particular relative increase in your desired proportion, for small proportions, **requires collecting at least a certain number of “successes”**. Measuring a 5\% increase in upgraded teams requires collecting 12500 upgraded teams. Powering an A/B test to measure a 1\% increase in clickthrough rate requires 313000 clickthroughs.
 
