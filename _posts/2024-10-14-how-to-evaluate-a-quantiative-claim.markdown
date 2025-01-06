@@ -4,6 +4,13 @@ title:  "How to evaluate a quantitative claim"
 date:   2024-10-14 05:07:59 -0500
 categories: jekyll update
 ---
+## Tl;dr
+
+I discuss:
+
+- How many claims are quantitative, even if they don't appear so at first glance
+- How reformulating an implicitly quantitative claim as an explicitly quantitative one is often not trivial
+- A three part framework for evaluating quantitative claims, focusing on issues like practical significance and uncertainty
 
 ## Introduction
 
