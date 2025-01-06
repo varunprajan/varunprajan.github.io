@@ -4,6 +4,13 @@ title:  "A graphical exploration of power, type S, and type M errors"
 date:   2024-12-05 05:07:59 -0500
 categories: jekyll update
 ---
+## Tl;dr
+
+I discuss:
+
+- What are "type M" and "type S" errors
+- How they have a simple graphical interpretation
+- How these errors change if the effect size itself is uncertain: a form of "prior sensitivity"
 
 ## Introduction
 
