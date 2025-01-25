@@ -5,6 +5,18 @@ date:   2023-10-31 23:07:59 -0500
 categories: jekyll update
 ---
 
+## Tl;dr
+
+I discuss:
+
+- A taxonomy of tests for data:
+    - Unit tests
+    - Data diff tests
+    - Constraint-based tests
+    - Statistic-based tests
+- A case study/worked example of how each test type works to catch errors that other types of tests do not catch
+- How widely used tools, such as dbt, do not easily support some of these test types, particularly statistic-based tests (and how this is bad!)
+
 ## Introduction
 
 Back in grad school, I used to write objectively terrible code: hundred-plus line functions, spaghettified logic, no separation of concerns, and whatever the opposite of DRY is ([WET?](https://betterprogramming.pub/when-dry-doesnt-work-go-wet-6befda0444bf)). Worst of all, I never wrote tests. Without tests, it is difficult to iterate on your codebase, let alone quickly. Testing ensures that, when you refactor existing code, it continues to perform as it had before. It also makes sure that, when you add new features, they behave as intended and, moreover, don’t break existing functionality.

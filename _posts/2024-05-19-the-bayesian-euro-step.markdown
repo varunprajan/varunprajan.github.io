@@ -5,6 +5,15 @@ date:   2024-05-19 23:07:59 -0500
 categories: jekyll update
 ---
 
+## Tl;dr
+
+I discuss:
+
+- The pros and cons of a Bayesian approach to A/B testing, versus traditional NHST testing
+- How, while the Bayesian approach eliminates some difficulties with NHST, it introduces its own
+- How, there are strong dependencies of some results, like the false positive error, on the width of the prior distribution
+- How broad or "non-informative" priors should not be used in Bayesian A/B testing
+
 ## Introduction
 
 Null hypothesis significance testing (NHST) is a notoriously tricky topic, and, even now, I find myself fumbling when trying to answer the question “what does a p-value from an A/B test really mean?”
