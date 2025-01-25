@@ -4,6 +4,13 @@ title:  "The dual mandate of A/B testing"
 date:   2024-09-14 23:07:59 -0500
 categories: jekyll update
 ---
+## Tl;dr
+
+I discuss:
+
+- How A/B testing has two goals: driving decisions and generating insights
+- How many of the "tricks" for achieving the first goal (bandits, sequential testing, proxy metrics, etc.) actually work at cross-purposes to the second goal
+- So, there is "no free lunch", and by making decisions faster we often lose something in exchange
 
 ## Introduction
 

@@ -5,6 +5,17 @@ date:   2024-06-21 23:07:59 -0500
 categories: jekyll update
 ---
 
+## Tl;dr
+
+I discuss:
+
+- Important implications of the sample size formula for A/B tests with binary metrics
+- How, in one limit, we recover the "law of successes", which tells us we have to run the test long enough to achieve a certain number of success
+- How this law has wide-ranging implications, including:
+	- Explaining why A/B testing at B2B companies differs from that at D2C companies
+	- Why overexposure is not necessarily as bad as we think
+	- How guardrails, in particular, can be very challenging to power
+
 ## Introduction
 
 This post could be one sentence. I could tell you to use a sample size calculator (e.g., [Evan Miller’s Sample Size Calculator](https://www.evanmiller.org/ab-testing/sample-size.html)), plug in the relevant values (conversion rate, minimum detectable effect, alpha, power), copy the result, and paste it into your A/B test brief. Borrowing from quantum mechanics, we might call this approach “[shut up and calculate](https://en.wikiquote.org/wiki/Shut_up_and_calculate)”. I have no real objections to it, but it doesn’t make for terribly interesting content.
