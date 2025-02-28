@@ -69,7 +69,7 @@ I remember being interviewed a few years ago and asked, “what would you do in 
 
 Now, I’m not so sure. Some forgetfulness might not be a bad thing. The constant churn of organizational structure and personnel in tech might have the happy consequence of making us forget what we tried in the past, and therefore be willing to try it again. If the experiment’s audience and/or its behavior have changed in substantial ways since our last attempt, we might reverse our previous failures.
 
-I’m being slightly facetious. But only slightly! I think there are strong reasons to re-run experiments again and again, especially after the product or the userbase has undergone massive changes. And re-running experiments can make sense whether the initial experiment was successful or not!
+I’m being slightly facetious. But only slightly! There are strong reasons to re-run experiments again and again, especially after the product or the userbase has undergone massive changes. And re-running experiments can make sense whether the initial experiment was successful or not!
 
 In the former case, we estimate a new treatment effect, and can do further analysis (like HTEs) to try to decompose that effect into its drivers. We might learn something about the importance of various changes (product, userbase, macroeconomic) that transpired between our last attempt and the current one. In some cases, we might even learn that what we had previously shipped is actually neutral, or even negative! Either our previous result was a false positive, or the test we’re running now is fundamentally different than the previous one, for the reasons described above.
 
@@ -79,6 +79,6 @@ In the latter case, of a previously failed experiment, we might be newly success
 
 What I’ve discussed might strike you as unsatisfactory. Is the knowledge gained from A/B testing largely unstable and contingent? Do we need to run, and re-run, tests constantly? Can’t we learn something once and be done with it?
 
-There is obviously a compromise to be made between trying out new ideas and re-assessing old ones. But I think that, at least at the companies I’ve worked at, that balance is tipped too strongly towards the former and away from the latter.
+There is obviously a compromise to be made between trying out new ideas and re-assessing old ones. But, at least at the companies I’ve worked at, that balance is tipped too strongly towards the former and away from the latter.
 
 Of course, re-running past experiments and analyzing them takes time, particularly if advanced techniques, like HTEs, are not part of the experimentation platform. Data scientists’ time is precious, and we already have too much to do. But the risk of not re-running experiments is also great: the danger is that you’ve climbed a hill that no longer exists.
