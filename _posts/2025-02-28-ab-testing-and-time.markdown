@@ -73,7 +73,7 @@ I’m being slightly facetious. But only slightly! There are strong reasons to r
 
 In the former case, we estimate a new treatment effect, and can do further analysis (like HTEs) to try to decompose that effect into its drivers. We might learn something about the importance of various changes (product, userbase, macroeconomic) that transpired between our last attempt and the current one. In some cases, we might even learn that what we had previously shipped is actually neutral, or even negative! Either our previous result was a false positive, or the test we’re running now is fundamentally different than the previous one, for the reasons described above.
 
-In the latter case, of a previously failed experiment, we might be newly successful. Typically, though, re-running a previously failed experiment requires a strong rationale. This could be informed by the HTE-type analysis discussed above. (For example: “we expect users will respond differently to these in-product notifications, given the pricing and bundling changes we launched 2 months ago has changed the userbase in X and Y ways”)
+In the latter case, of a previously failed experiment, we might be newly successful. Typically, though, re-running a previously failed experiment requires a strong rationale. This could be informed by the HTE-type analysis discussed above. (For example: “we expect users will respond differently to these in-product notifications, given the pricing and bundling changes we launched 2 months ago have changed the userbase in X and Y ways”)
 
 ## Concluding remarks
 
