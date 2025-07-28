@@ -1,4 +1,11 @@
-# Introduction
+---
+layout: post
+title:  "How is my feature doing?"
+date:   2025-07-27 00:07:59 -0500
+categories: jekyll update
+---
+
+## Introduction
 
 Suppose we are assigned to a particular feature of a product: the checkout flow, a tab in the mobile app, the “[AI DJ](https://newsroom.spotify.com/2023-02-22/spotify-debuts-a-new-ai-dj-right-in-your-pocket/)”, etc. Someone above our pay grade asks us: is the feature doing well? How might we respond?
 
@@ -10,11 +17,11 @@ So typically each health metric is accompanied by a target. Unfortunately, it is
 
 For now, I’ll ignore the “happy path”, wherein a feature manages to hit its targets for each of its health metrics. (Even if this is possible for months, or even years, eventually growth flattens out or targets are raised.) Suppose instead we’re traveling down the unhappy path. Health metrics aren’t meeting their targets, and the feature isn’t doing well, relative to expectations. Helping the business diagnosing the issue is usually within data science’s purview. If the feature is unhealthy, why is that?
 
-# Funnels and segments
+## Funnels and segments
 
 The approach I’ve seen most often in the industry is composed of two separate but related analyses. I’ll call them “funnels” and “segments”. In a funnel analysis, we decompose the *feature* into its constituent parts. In a segmentation analysis, we decompose the *population*.
 
-## Funnel analysis
+### Funnel analysis
 
 Here’s an example. Suppose we’re interested in learning whether the checkout flow is “doing well”. Suppose checkout has two pages. On the first, the customer views their cart, and on the second, they enter their shipping information, payment details, and actually place the order. (Real checkout flows can be [a lot more complicated](https://blog.logrocket.com/ux-design/designing-seamless-checkout-flow/), of course.) If our health metric is “number of orders placed”, we can decompose that into three sub-metrics: the number of “page 1” (view cart) impressions, the number of “page 2” (shipping/payment) impressions, and the number of orders placed. The rates of dropoff between each step can be multiplied together to give an overall “success rate”. See illustration below.
 
@@ -28,7 +35,7 @@ A second issue is that funnel analyses often tacitly assume some sort of “all 
 
 A final issue is that, when these sub-metrics do change, it’s not obvious whether it’s our doing or not. (“[Men](https://en.wikipedia.org/wiki/Julius_Caesar_(play)) at sometime are masters of their fates”, as Shakespeare wrote.) Funnel metrics can change because our product changes. But they can also change because the audience using the product is changing. More organic or paid users; more new or tenured users; more users from Western or non-Western countries; more mobile or desktop users; or simply the same users, acting differently — each of these factors can drive changes in funnel metrics, even if the feature remains exactly the same. A/B tests can help tease apart effects that are in our stars from ones that are in ourselves. But it is not that easy to prove, to anyone’s satisfaction, that a certain number going up is our doing or not.
 
-## Segmentation analysis
+### Segmentation analysis
 
 One way of trying to gain more insight is to control for these “audience” effects. We can measure, in theory, the number of organic and paid users, new and tenured users, etc. So we can decompose the overall metric not just into funnel steps, but also into segment cuts. See illustration below.
 
@@ -41,7 +48,7 @@ Even when trying to control for audience behavior, the same issues arise as thos
 
 Segmentation analysis is often trivial and rarely profound. We end up with statements like “iOS users have better activity and retention metrics than Android users”. Even if that is true, how does it help us optimize the product? Such correlations are rarely actionable. If iOS users exhibit better metrics, it might be because having an iPhone or iPad is a proxy for income, and higher income users tend to have better metrics than lower income ones. It doesn’t necessarily mean that encouraging iOS usage (whatever that means) would help achieve the company’s goals.
 
-## Some caveats
+### Some caveats
 
 I don’t mean to imply that *all* analyses of this type are useless. I find they’re most useful as part of one of three categories. The first is uncovering “bugs”. These are cases where metrics (particularly rates) are implausibly low, or at least very much lower than a corresponding metric for a different segment. If a metric is 20% on Android but 90% on iOS, this probably can’t just be attributed to income effects. There might a bug on Android that the engineers should look into. That being said, these types of discoveries are not that common and they often require a large “fishing expedition” to uncover.
 
@@ -51,7 +58,7 @@ The final case involves understanding how a target might even be achieved. If we
 
 But apart from bug bashing, hypothesis testing, and impact sizing, these analyses are just not that useful. The benefits usually don’t outweigh the costs. Depending on how poorly the data warehouse is structured, and how bespoke the segments and funnel steps are, even pulling the data itself can take days, if not weeks. Analyzing it — not just doing aggregations, but trying to tease apart causation from correlation, exogeneity from endogeneity — can take even longer. I’ve seen companies spend months and months monitoring and dissecting health metrics, with very little to show for it. (Besides leadership being assuaged that we’re thinking deeply about the problem, which is often what matters most.)
 
-# Who should we target?
+## Who should we target?
 
 Marx [once wrote](https://en.wikipedia.org/wiki/Theses_on_Feuerbach), “The philosophers have only interpreted the world, in various ways. The point, however, is to change it.”
 
@@ -77,7 +84,7 @@ In fact, this is one of the best applications of segment and funnel analysis, an
 2. Run a (preferably overpowered) A/B/C… test on these variants. (Accept that you might have to incur some short term losses to do so.)
 3. Then, run a heterogeneous treatment effect analysis (which requires overpowering) to see which segments were stat-sig better, or worse, for particular variants. If there are none, then personalization is probably a dud. If there are, and if the effect sizes are noteworthy, it’s worth investigating further.
 
-# Closing thoughts
+## Closing thoughts
 
 Comparing metrics to their targets, and the “segmentation” and “funnel” analyses that accompany this effort, is rarely very useful, and is often downright useless. Although this kind of work can make CEOs happy, it struggles to be actionable — to guide product thinking. There are a number of problems: exponentially-growing complexity as funnels become more intricate and segments multiply; inability to distinguish between exogenous and endogenous effects; dubious “all other things being equal” or “no cannibalization” assumptions; and difficulties translating segment performance into recommendations for which segments to target. Even if we have every segmenting feature we’d like, and a perfectly predictive ML model, we typically still struggle to bridge the gap between what these analyses provide (correlation) and what we want (causation).
 
