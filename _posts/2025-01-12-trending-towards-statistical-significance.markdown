@@ -84,7 +84,7 @@ For the null hypothesis, we get the following two figures (first for 51% sample,
 
 ![t-statistic change for "slightly more" sample](/assets/img/null_slightly_more_sample.png "slightly more")
 
-![t-statistic change for "well powered sample"](/assets/img/null_lot_more_sample.png "well pwoered")
+![t-statistic change for "well powered sample"](/assets/img/null_lot_more_sample.png "well powered")
 
 It is true, as Zach Flynn wrote, that for slightly more sample, the change in the t-statistic is uncorrelated with the t-statistic itself. Moreover, this change is on average zero: not surprising, given that the null hypothesis is true. So, if we run an A/B test for slightly longer, and there is no effect, the p-value will go up with 50% probability, and down with 50% probability. In this scenario, “trending towards significance” is meaningless, because there is no trend.
 
