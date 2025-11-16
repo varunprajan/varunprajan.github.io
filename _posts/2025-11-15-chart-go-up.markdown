@@ -15,7 +15,7 @@ Actually, ”Moderate Democratic candidates enjoyed a nearly four-point advantag
 
 Actually, “with the massive decrease in death rates, [Covid is now no more dangerous than the flu](https://www.npr.org/sections/health-shots/2022/09/16/1122650502/scientists-debate-how-lethal-covid-is-some-say-its-now-less-risky-than-flu) for those who catch it. Epidemiological data [showed the same thing in the UK](https://www.ft.com/content/e26c93a0-90e7-4dec-a796-3e25e94bc59b) back in the spring.” ([Noah Smith](https://www.noahpinion.blog/p/the-end-of-the-pandemic))
 
-Actually (Will Stancil[https://bsky.app/profile/whstancil.bsky.social/post/3m567gfggic2y]),
+Actually ([Will Stancil](https://bsky.app/profile/whstancil.bsky.social/post/3m567gfggic2y)),
 
 ![](/assets/img/stancil_income.png "stancil_income")
 
