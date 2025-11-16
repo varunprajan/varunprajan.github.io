@@ -17,7 +17,7 @@ Actually, “with the massive decrease in death rates, [Covid is now no more dan
 
 [Actually](https://bsky.app/profile/whstancil.bsky.social/post/3m567gfggic2y),
 
-![](/assets/img/stancil_income.png "stancil_income"){: width="250" }
+![](/assets/img/stancil_income.png "stancil_income")
 
 I am not against numbers. In fact, I spend most of my working hours dealing with them! Sometimes numbers are genuinely illuminating, and can represent a lighthouse in a fog of anecdotes.
 

@@ -8,7 +8,7 @@ categories: jekyll update
 ## Tl;dr
 - I discuss how the effort to answer the question "how is my feature doing?" is often misguided
 - Such efforts often focus on "funnel" and "segment" analyses, which can be misleading and are usually not actionable
-- I discuss a more useful approach, which is to run a heterogeneous effect analysis on top of experimental data
+- I discuss a more useful approach, which is to run a heterogeneous treatment effect (HTE) analysis on experimental data
 
 ## Introduction
 
