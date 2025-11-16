@@ -15,7 +15,7 @@ Actually, ”Moderate Democratic candidates enjoyed a nearly four-point advantag
 
 Actually, “with the massive decrease in death rates, [Covid is now no more dangerous than the flu](https://www.npr.org/sections/health-shots/2022/09/16/1122650502/scientists-debate-how-lethal-covid-is-some-say-its-now-less-risky-than-flu) for those who catch it. Epidemiological data [showed the same thing in the UK](https://www.ft.com/content/e26c93a0-90e7-4dec-a796-3e25e94bc59b) back in the spring.” ([Noah Smith](https://www.noahpinion.blog/p/the-end-of-the-pandemic))
 
-[Actually](https://bsky.app/profile/whstancil.bsky.social/post/3m567gfggic2y),
+Actually (Will Stancil[https://bsky.app/profile/whstancil.bsky.social/post/3m567gfggic2y]),
 
 ![](/assets/img/stancil_income.png "stancil_income")
 
@@ -47,22 +47,18 @@ First, there are the **trustworthiness** issues. Stancil claims that “real med
 
 > The quantity of transportation our modern commuter purchases with his transportation budget, in terms of miles traveled, is extraordinary, even miraculous, from his antecedent's perspective. Less than ten percent of his wages now purchase miles and miles of point-to-point, off-street-line transportation, which might easily have consumed his entire salary in 1925!
 > 
+> So, in a certain sense, our modern commuter is a whole lot richer. Economic statisticians *accurately* measure his real consumption bundle as much, much larger than his predecessor's due to the collapse in cost, increase in speed and comfort, of transportation.
 > 
-> So, in a certain sense, our modern commuter is a whole lot richer. Economic statisticians *accurately* measure his real consumption bundle as much, much larger than his 
-> predecessor's due to the collapse in cost, increase in speed and comfort, of transportation.
-> 
-> But in another respect, our modern commuter is not richer at all. The world has changed. He no longer *has the option* of taking a job whose quality and pay would support his typical 
-> commuter lifestyle absent accepting an obligation to purchase all of those transportation miles.
+> But in another respect, our modern commuter is not richer at all. The world has changed. He no longer *has the option* of taking a job whose quality and pay would support his typical commuter lifestyle absent accepting an obligation to purchase all of those transportation miles.
 > 
 
-To simplify a bit, “median household income” measures your ability to buy transportation services. But it does not measure the cost of getting to work or living your life. The metric differs from its goal, and our ignorance of this fact has blinded us to the ways in which we’ve become poorer, not richer.
+To simplify a bit, “real median household income” measures, in part, your ability to buy transportation services. But it does not account for how getting to work, or living your life, has become more time-consuming. The metric differs from its goal, and our ignorance of this fact has blinded us to the ways in which we’ve become poorer, not richer.
 
-(There’s also the issue that median real household income does not include [welfare transfers or household wealth](https://www.crisesnotes.com/one-election-takeaway-voters-hate-temporary-safety-nets/) — it measures how much you earn, not how much you have to spend.)
+(There’s also the issue that real median household income does not include [welfare transfers or household wealth](https://www.crisesnotes.com/one-election-takeaway-voters-hate-temporary-safety-nets/) — it measures how much you earn, not how much you have to spend.)
 
 Another aspect of trustworthiness is “**selection bias** in data generation, collection, transformation, and definition”. Both “inflation” and “median household income” (which is derived from inflation) suffer from such biases:
 
-> When constructing measures of the price level, if we fail to take into account adjustments in quality, we'll get things very wrong. BLS [does adjust for quality](https://www.bls.gov/cpi/quality-adjustment/)! But they can only do so for characteristics that can be straightforwardly quantified, and their relationship to price modeled. Plus, there are lots of characteristics that plainly affect the quality of our consumption of a good or service that would, for a variety of reasons, be controversial to incorporate into a price measure, and so aren't.
-> 
+> When constructing measures of the price level, if we fail to take into account adjustments in quality, we'll get things very wrong. BLS [does adjust for quality](https://www.bls.gov/cpi/quality-adjustment/)! But they can only do so for characteristics that can be straightforwardly quantified, and their relationship to price modeled. Plus, there are lots of characteristics that plainly affect the quality of our consumption of a good or service that would, for a variety of reasons, be controversial to incorporate into a price measure, and so aren't. 
 > 
 > Suppose we faced a new national crime wave that led to a broad-based increase in ones risk of getting mugged or ones house burgled. The risk level has increased similarly basically everywhere. For all of us, then, the value in real terms of our housing will have declined. Nearby crime is definitely a component of the lived quality of housing!
 > 
@@ -72,7 +68,6 @@ The “selection bias” here lies in what components of quality are measurable.
 Finally, there is the “**inclusivity and fairness**” problem with metrics — not just how the number has moved, but how it has moved for different units or “segments”. A serious problem with Stancil’s chart is that it ignores these distributional issues.
 
 > The less rich spend a greater much fraction of their wealth on necessities and [inferior goods](https://en.wikipedia.org/wiki/Inferior_good) than the wealthy do. A quick glance at the graph above confirms that prices have tended to increase quickly for the necessities that consume a large share of the median consumer's budget, while we've enjoyed outright deflation in more discretionary goods. So "median household real income" is overstated for the median consumer, because *its very units* are biased toward the experience of the better off.
-> 
 > 
 > This bias would disappear if variability in the rate of price changes happened to be orthogonal to differences in the consumption bundle between the rich and less rich, but that is unlikely ever to be the case. Independence of variables in social affairs is the rare exception, not the rule.
 > 
