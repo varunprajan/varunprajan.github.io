@@ -5,6 +5,11 @@ date:   2025-07-27 00:07:59 -0500
 categories: jekyll update
 ---
 
+## Tl;dr
+- I discuss how the effort to answer the question "how is my feature doing?" is often misguided
+- Such efforts often focus on "funnel" and "segment" analyses, which can be misleading and are usually not actionable
+- I discuss a more useful approach, which is to run a heterogeneous effect analysis on top of experimental data
+
 ## Introduction
 
 Suppose we are assigned to a particular feature of a product: the checkout flow, a tab in the mobile app, the “[AI DJ](https://newsroom.spotify.com/2023-02-22/spotify-debuts-a-new-ai-dj-right-in-your-pocket/)”, etc. Someone above our pay grade asks us: is the feature doing well? How might we respond?
