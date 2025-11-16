@@ -57,6 +57,8 @@ First, there are the **trustworthiness** issues. Stancil claims that “real med
 
 To simplify a bit, “median household income” measures your ability to buy transportation services. But it does not measure the cost of getting to work or living your life. The metric differs from its goal, and our ignorance of this fact has blinded us to the ways in which we’ve become poorer, not richer.
 
+(There’s also the issue that median real household income does not include [welfare transfers or household wealth](https://www.crisesnotes.com/one-election-takeaway-voters-hate-temporary-safety-nets/) — it measures how much you earn, not how much you have to spend.)
+
 Another aspect of trustworthiness is “**selection bias** in data generation, collection, transformation, and definition”. Both “inflation” and “median household income” (which is derived from inflation) suffer from such biases:
 
 > When constructing measures of the price level, if we fail to take into account adjustments in quality, we'll get things very wrong. BLS [does adjust for quality](https://www.bls.gov/cpi/quality-adjustment/)! But they can only do so for characteristics that can be straightforwardly quantified, and their relationship to price modeled. Plus, there are lots of characteristics that plainly affect the quality of our consumption of a good or service that would, for a variety of reasons, be controversial to incorporate into a price measure, and so aren't.
