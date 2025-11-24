@@ -1,0 +1,103 @@
+---
+layout: post
+title:  "Turning a big dial and constantly looking back at the audience"
+date:   2025-11-15 00:00:59 -0500
+categories: jekyll update
+---
+
+## Introduction
+
+> The company essentially turned a dial that made ChatGPT more appealing and made people use it more, but sent some of them into delusional spirals.
+>
+> OpenAI has since made the chatbot safer, but that comes with a tradeoff: less usage.
+> 
+
+[Kashmir Hill](https://bsky.app/profile/kashhill.bsky.social/post/3m6cxqbppd224), "What OpenAI Did When ChatGPT Users Lost Touch With Reality”, *The New York Times*
+
+Once you start seeing dials in tech, you can’t unsee them. Grok has an [interjecting-white-genocide-into-every-conversation](https://www.theatlantic.com/technology/archive/2025/05/elon-musk-grok-white-genocide/682817/) dial, a [MechaHitler](https://www.npr.org/2025/07/09/nx-s1-5462609/grok-elon-musk-antisemitic-racist-content) dial, and an [Elon-is-the-greatest-lover](https://www.rollingstone.com/culture/culture-features/elon-musk-grok-lebron-james-1235469906/) dial. Twitter (now called X) has dials to [suppress links](https://cybernews.com/news/musk-x-posts-with-links-suppression/), to [stifle left-leaning content](https://bsky.app/profile/paleofuture.bsky.social/post/3m63zwpxgns2p), to [boost pro-Trump content](https://www.the-independent.com/tech/elon-musk-trump-x-algorithm-bias-b2640976.html), and even to push [its owner’s tweets](https://www.rollingstone.com/culture/culture-news/elon-musk-engineers-twitter-engagement-1234680113/) to the top of your feed. The entire website is, [arguably](https://bsky.app/profile/dieworkwear.bsky.social/post/3m6bygmkksc2d), [Dril’s parodic tweet](https://knowyourmeme.com/memes/turning-a-big-dial-that-says-racism-on-it) made real (”turning a big dial taht says "Racism" on it and constantly looking back at the audience for approval like a contestant on the price is right”).
+
+It’s not just the Elonverse. Facebook/Meta turned dials before it was cool. In one infamous experiment, it [showed that it could drive](https://www.scientificamerican.com/article/facebook-experiment-found-to-boost-us-voter-turnout/) an extra 340k people to vote in the 2010 midterm elections with only a single Election Day message. (In an amusing coda, ”Cameron Marlow, head of Facebook's data-science team and a co-author of the paper…declined to comment on whether Facebook would deploy any message to help to increase voter turnout at this year's US presidential election.”) More recently, it appears to have [quashed research](https://www.reuters.com/sustainability/boards-policy-regulation/meta-buried-causal-evidence-social-media-harm-us-court-filings-allege-2025-11-23/) showing that *deactivating* Facebook and Instagram was linked to “lower feelings of depression, anxiety, loneliness and social comparison”. (”[A] staffer worried that keeping quiet about negative findings would be akin to the tobacco industry “doing research and knowing cigs were bad and then keeping that info to themselves.”)
+
+YouTube has a dial for [right-wing radicalization](https://www.ucdavis.edu/curiosity/news/youtube-video-recommendations-lead-more-extremist-content-right-leaning-users-researchers), Instagram has one for [self-harm](https://euroweeklynews.com/2024/12/08/instagram-slammed-for-self-harm-networks-contributing-to-rising-suicide-rates/), OpenAI has one for psychosis. In the past, the dials used to be largely on the content recommendation side. Now, with chatbots, content recommendation isn’t the only challenge — LLMs are themselves generating the content, and [RAG](https://en.wikipedia.org/wiki/Retrieval-augmented_generation) involves aspects of both content recommendation and generation.
+
+A lot of data science work at such companies involves turning different dials, in the context of an A/B test, and measuring what happens. I'll quote Hill at length:
+
+> Mr. Turley [head of ChatGPT] wasn’t like OpenAI’s old guard of A.I. wonks. He was a product 
+guy who had done stints at Dropbox and Instacart. His expertise was making technology that people wanted to use, and improving it on the fly. To do that, OpenAI needed metrics.
+> 
+> 
+> In early 2023, Mr. Turley said in an interview, OpenAI contracted an audience measurement company — which it [has since acquired](https://archive.ph/o/v4dPa/https://www.statsig.com/blog/openai-acquisition) — to track a number of things, including how often people were using ChatGPT each hour, day, week and month.
+> 
+> …
+> 
+> Updates took a tremendous amount of effort. For the one in April, engineers created many new versions of GPT-4o — all with slightly different recipes to make it better at science, coding and fuzzier traits, like intuition. They had also been working to improve the chatbot’s memory.
+> The many update candidates were narrowed down to a handful that scored highest on intelligence and safety evaluations. When those were rolled out to some users for a standard industry practice called A/B testing, the standout was a version that came to be called HH internally. Users preferred its responses and were more likely to come back to it daily, according to four employees at the company.
+> 
+> But there was another test before rolling out HH to all users: what the company calls a “vibe check,” run by Model Behavior, a team responsible for ChatGPT’s tone. Over the years, this team had helped transform the chatbot’s voice from a prudent robot to a warm, empathetic friend.
+> 
+> That team said that HH felt off, according to a member of Model Behavior.
+> 
+> …
+> 
+> The A/B testers had liked HH, but in the wild, OpenAI’s most vocal users hated it. Right away, they complained that ChatGPT had become absurdly sycophantic, lavishing them with unearned flattery and telling them they were geniuses. When one user mockingly asked whether a “[soggy cereal cafe](https://archive.ph/o/v4dPa/https://x.com/mattshumer_/status/1916876343771345247)” was a good business idea, the chatbot replied that it “has potential.”
+> 
+> By Sunday, the company decided to spike the HH update and revert to a version released in late March, called GG.
+> 
+> It was an embarrassing reputational stumble. On that Monday, the teams that work on ChatGPT gathered in an impromptu war room in OpenAI’s Mission Bay headquarters in San Francisco to figure out what went wrong.
+> 
+> “We need to solve it frickin’ quickly,” Mr. Turley said he recalled thinking. Various teams examined the ingredients of HH and discovered the culprit: In training the model, they had weighted too heavily the ChatGPT exchanges that users liked. Clearly, users liked flattery too much.
+> 
+
+## The data science perspective
+
+It’s widely known that companies can reap benefits by making their products more addictive and societally harmful. As the Facebook staffer mentioned, Facebook is only borrowing from the Philip Morris playbook, it isn’t inventing it.
+
+What is unusual about tech, though, is the scale and precision. Making cigarettes isn’t a data science problem. But making the digital equivalent is.
+
+### **Causality**
+
+Because these companies have the ability to run randomized experiments, effects are truly causal. It took decades for scientists to satisfactorily prove that secondhand smoke causes cancer. It takes Meta and OpenAI weeks to evaluate the (short-term) causal impact of their dials.
+
+### **Effect sizes**
+
+Experiments at Meta and OpenAI affect hundreds of millions of users. Even relatively small effects in relative terms imply large effects in absolute terms (tens or hundreds of thousands of people). In Facebook’s experiment on influencing voting behavior, reported effect sizes were on the order of tenths of a percent. OpenAI estimates that 0.07% of its users, or 560,000, show signs of “psychosis or mania” when interacting with ChatGPT. If effect sizes for OpenAI experiments are even a mere 5% (relative), turning the psychosis dial might affect the mental health of tens of thousands of people. A decision made by an OpenAI data scientist can *cause* tens or hundreds of suicides. Such is the peril of scale.
+
+### **Instruments**
+
+Products like ChatGPT and Facebook have a variety of reasonably strong instruments, in the econometrics sense. They can **encourage** more people to vote, to spend more time on the app, to share more, to have longer conversations, to consume more political content, or more content from friends, or more video, or less, all by turning one or more dials. They can’t necessarily force people to do any of these things. As in all [encouragement designs](https://engineering.atspotify.com/2023/08/encouragement-designs-and-instrumental-variables-for-a-b-testing), there will be the “never-takers” and “always-takers” — the ones whose behavior is unaffected by the encouragement. These are the people who would have voted anyway, or weren’t going to vote regardless. The people who didn’t need ChatGPT to be mentally unhealthy, or who would never succumb to ChatGPT’s flatteries and delusions. But never-takers and always-takers are never 100% of the population. There always seem to be enough “compliers” for these companies to observe meaningful effects in A/B tests.
+
+Given that, it’s easy to understand why many in tech fall back to self-serving libertarianism. If the ultimate responsibility lies with the individual, then the companies turning the dials are, by definition, not responsible. They’re only encouraging, not coercing.
+
+### **Metrics**
+
+OpenAI appears to have a variety of metrics they use as primary, secondary, and guardrails. There’s sycophancy and “vibes”. Watch time. Retention. Daily, weekly, and monthly active users. User mental health. “Coding strength”, “intuition”, and so on. The great achievement of machine learning has been to replace human heuristics with learned weights. But there are still heuristics involved in deciding **what** to optimize for, as opposed to **how** to optimize. Hill mentioned that OpenAI’s “HH” model over-weighted exchanges that users liked. Deciding on that weight is still a heuristic judgment.
+
+Hill reported that model HH drove higher user retention. My guess is that at OpenAI’s scale, most metric movements are both practically and statistically significant. The dials really do matter. Deciding which model to ship — which model to show to hundreds of millions of users around the world — comes down to how the primary, secondary, and guardrail metrics are considered against each other. Deciding on the “decision criteria” remains, for now, a deeply human endeavor.
+
+I don’t believe that companies are totally callous, and will always choose the option that maximizes engagement, other metrics be damned. (If that were the case, model HH wouldn’t have been reverted.) OpenAI does care about reputation and lawsuits, at the very least. But the danger of having a dial to increase engagement is that you’re constantly tempted to use it.
+
+### **Heterogeneous treatment effects**
+
+Another benefit of scale — hundreds of millions of WAU — is that you can segment your experiments. Effects might be larger or smaller for certain sub-groups. You might know, for example, that particular groups are more or less prone to social comparison, self-harm, or psychosis. It seems likely that, even when particular metrics improve overall, they become worse for some of these groups: the most vulnerable ones. It also seems plausible that OpenAI and Meta can measure these effects with high precision.
+
+The dilemma for their data scientists and product managers is: how much worse off are you willing to make these groups in order to make your overall product metrics “better”? It is a similar tradeoff to the one discussed by [Ursula K. Le Guin](https://en.wikipedia.org/wiki/The_Ones_Who_Walk_Away_from_Omelas), or by Fyodor Dostoevsky:
+
+> I challenge you: let’s assume that you were called upon to build the edifice of human destiny so that men would finally be happy and would find peace and tranquility. If you knew that, in order to attain this, you would have to torture just one single creature, let’s say the little girl who beat her chest so desperately in the outhouse, and that on her unavenged tears you could build that edifice, would you agree to do it?
+> 
+
+The public seems to be [appalled](https://www.npr.org/sections/shots-health-news/2025/09/19/nx-s1-5545749/ai-chatbots-safety-openai-meta-characterai-teens-suicide) by the idea that ChatGPT might drive just a few individuals to suicide. As a data scientist at OpenAI, it seems impossible to avoid such an outcome. It is almost certainly the case that such a data scientist has okayed a model that has *caused* suicide. (HH was likely one.) And, even if not, the pressure to do so will always exist, provided government regulation remains laissez-faire.
+
+## Closing thoughts
+
+At some theoretical level, I find products like ChatGPT and Instagram fascinating. They have genuinely big data. Their content recommendation and content generation algorithms have causally strong effects on user behavior. They pose difficult questions about balancing metrics, and [overall evaluation criteria](https://exp-platform.com/advanced-topics-in-online-experiments/). They provide opportunities for detecting heterogeneous treatment effects.
+
+On a practical level, though, I would find it horrifying to work on these products as a data scientist. There will always be the dark utilitarian temptations I discussed above: to turn the dial so that DAU goes up, even if other things go down, to fuck with some fraction of users in order to satisfy investors. These companies are essentially running psychology experiments on millions of people, all without external supervision.
+
+OpenAI, to its credit, has improved the safeguards on their models, and GPT-5 is reportedly “safer” than GPT-4. But postponing the dilemma does not make it disappear. What happens when the competitive landscape grows even more competitive, when interest rates rise, when companies must pay back the cash they so profligately burned through? What happens when the boom times disappear, and companies get more desperate? Hill’s article closes with this ominous passage:
+
+> In October, Mr. Turley, who runs ChatGPT, made an urgent announcement to all employees. He declared a “Code Orange.” OpenAI was facing “the greatest competitive pressure we’ve ever seen,” he wrote, according to four employees with access to OpenAI’s Slack. The new, safer version of the chatbot wasn’t connecting with users, he said.
+
+The message linked to a memo with goals. One of them was to increase daily active users by 5 percent by the end of the year.
+> 
+
+There are a bunch of hard ways of achieving that goal that don’t exacerbate the mental health crisis. But there’s also one easy way that does.
