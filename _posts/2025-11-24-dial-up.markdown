@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Turning a big dial and constantly looking back at the audience"
-date:   2025-11-15 00:00:59 -0500
+date:   2025-11-24 00:00:59 -0500
 categories: jekyll update
 ---
 
