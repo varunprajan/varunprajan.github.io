@@ -54,21 +54,21 @@ It’s widely known that companies can reap benefits by making their products mo
 
 What is unusual about tech, though, is the scale and precision. Making cigarettes isn’t a data science problem. But making the digital equivalent is.
 
-### **Causality**
+### Causality
 
 Because these companies have the ability to run randomized experiments, effects are truly causal. It took decades for scientists to satisfactorily prove that secondhand smoke causes cancer. It takes Meta and OpenAI weeks to evaluate the (short-term) causal impact of their dials.
 
-### **Effect sizes**
+### Effect sizes
 
 Experiments at Meta and OpenAI affect hundreds of millions of users. Even relatively small effects in relative terms imply large effects in absolute terms (tens or hundreds of thousands of people). In Facebook’s experiment on influencing voting behavior, reported effect sizes were on the order of tenths of a percent. OpenAI estimates that 0.07% of its users, or 560,000, show signs of “psychosis or mania” when interacting with ChatGPT. If effect sizes for OpenAI experiments are even a mere 5% (relative), turning the psychosis dial might affect the mental health of tens of thousands of people. A decision made by an OpenAI data scientist can *cause* tens or hundreds of suicides. Such is the peril of scale.
 
-### **Instruments**
+### Instruments
 
 Products like ChatGPT and Facebook have a variety of reasonably strong instruments, in the econometrics sense. They can **encourage** more people to vote, to spend more time on the app, to share more, to have longer conversations, to consume more political content, or more content from friends, or more video, or less, all by turning one or more dials. They can’t necessarily force people to do any of these things. As in all [encouragement designs](https://engineering.atspotify.com/2023/08/encouragement-designs-and-instrumental-variables-for-a-b-testing), there will be the “never-takers” and “always-takers” — the ones whose behavior is unaffected by the encouragement. These are the people who would have voted anyway, or weren’t going to vote regardless. The people who didn’t need ChatGPT to be mentally unhealthy, or who would never succumb to ChatGPT’s flatteries and delusions. But never-takers and always-takers are never 100% of the population. There always seem to be enough “compliers” for these companies to observe meaningful effects in A/B tests.
 
 Given that, it’s easy to understand why many in tech fall back to self-serving libertarianism. If the ultimate responsibility lies with the individual, then the companies turning the dials are, by definition, not responsible. They’re only encouraging, not coercing.
 
-### **Metrics**
+### Metrics
 
 OpenAI appears to have a variety of metrics they use as primary, secondary, and guardrails. There’s sycophancy and “vibes”. Watch time. Retention. Daily, weekly, and monthly active users. User mental health. “Coding strength”, “intuition”, and so on. The great achievement of machine learning has been to replace human heuristics with learned weights. But there are still heuristics involved in deciding **what** to optimize for, as opposed to **how** to optimize. Hill mentioned that OpenAI’s “HH” model over-weighted exchanges that users liked. Deciding on that weight is still a heuristic judgment.
 
@@ -76,7 +76,7 @@ Hill reported that model HH drove higher user retention. My guess is that at Ope
 
 I don’t believe that companies are totally callous, and will always choose the option that maximizes engagement, other metrics be damned. (If that were the case, model HH wouldn’t have been reverted.) OpenAI does care about reputation and lawsuits, at the very least. But the danger of having a dial to increase engagement is that you’re constantly tempted to use it.
 
-### **Heterogeneous treatment effects**
+### Heterogeneous treatment effects
 
 Another benefit of scale — hundreds of millions of WAU — is that you can segment your experiments. Effects might be larger or smaller for certain sub-groups. You might know, for example, that particular groups are more or less prone to social comparison, self-harm, or psychosis. It seems likely that, even when particular metrics improve overall, they become worse for some of these groups: the most vulnerable ones. It also seems plausible that OpenAI and Meta can measure these effects with high precision.
 
