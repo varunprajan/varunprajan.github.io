@@ -57,9 +57,9 @@ The great insight of CUPED is that the metric of interest is often correlated wi
 
 ![CUPED schematic](/assets/img/cuped_schematic.png)
 
-Let’s write some code! (Much of this is adapted from Matteo Courthoud’s excellent [blog post](https://matteocourthoud.github.io/post/cuped/#) about CUPED.) See [here](https://github.com/varunprajan/data-eng-blog/tree/34e9c3642573fe7591d6cbf9c35e55ac469e00f5/cuped) for the complete code, including a Jupyter notebook.
+Let’s write some code! (Much of this is adapted from Matteo Courthoud’s excellent [blog post](https://matteocourthoud.github.io/post/cuped/#) about CUPED.) See [here](https://github.com/varunprajan/data-eng-blog/tree/main/cuped) for the complete code, including a Jupyter notebook.
 
-In the data generation process, the continuous metric, $y$, is linearly related to the experiment group assignment (control = 0, treatment = 1), and to the pre-experiment value of $y$ ($X$). There is also Gaussian noise. The treatment effect is constant across all units (no heterogeneous treatment effects).
+In the data generation process, the continuous metric, $y$, is linearly related to the experiment group assignment (control = 0, treatment = 1), and to the pre-experiment value of $y$, which we'll call $X$. There is also Gaussian noise. The treatment effect is constant across all units (no heterogeneous treatment effects).
 
 $X$, in turn, might also be related to the experiment group assignment, if we have imperfect randomization/pre-exposure bias. (In this case, users in treatment stream for longer than users in control, even before the experiment begins.)
 
