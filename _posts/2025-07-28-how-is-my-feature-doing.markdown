@@ -20,7 +20,7 @@ One problem with this approach is that we haven’t *really* answered the questi
 
 So typically each health metric is accompanied by a target. Unfortunately, it is rare that a data scientist constructs these targets. And, confusingly, the target might represent either a prediction or an aspiration. If the business progresses as usual, we expect WAU to hit 10 million. That’s a prediction. But if we want WAU to reach 20 million instead, that’s an aspiration. Rarely are business leaders happy with business as usual.
 
-For now, I’ll ignore the “happy path”, wherein a feature manages to hit its targets for each of its health metrics. (Even if this is possible for months, or even years, eventually growth flattens out or targets are raised.) Suppose instead we’re traveling down the unhappy path. Health metrics aren’t meeting their targets, and the feature isn’t doing well, relative to expectations. Diagnosing the issue is usually data science’s responsibility. If the feature is unhealthy, why is that?
+For now, I’ll ignore the “happy path”, wherein a feature manages to hit its targets for each of its health metrics. (Even if this is possible for months, or even years, eventually growth flattens out or targets increase.) Suppose instead we’re traveling down the unhappy path. Health metrics aren’t meeting their targets, and the feature isn’t doing well relative to expectations. Diagnosing the issue is usually data science’s responsibility. If the feature is unhealthy, why is that?
 
 ## Funnels and segments
 
@@ -32,7 +32,7 @@ Here’s an example. Suppose we’re interested in learning whether the checkout
 
 ![funnel.png](/assets/img/funnel.png)
 
-Because there are decreasing numbers of users at each step, this is called a “funnel analysis” (the population shrinks from left to right, like a funnel turned on its side). In a more sophisticated analysis, we might come up with more intermediate steps (fills out shipping information but not payment details, places order but credit card fails, etc.), but here a simplified flow makes reasoning easier.
+Because there are decreasing numbers of users at each step, this is called a “funnel analysis” (the population shrinks from left to right, like a funnel turned on its side). In a more sophisticated analysis, we might come up with more intermediate steps (fills out shipping information but not payment details, places order but credit card fails, etc.), but reasoning about a simplified flow is easier, here.
 
 Immediately a few problems with funnel analyses become apparent. First, decomposing one overall metric into N sub-metrics can complicate more than it simplifies. Instead of needing to answer the question “why isn’t the overall metric hitting its target?” we need to answer N sub-questions: “why aren’t these N sub-metrics hitting their N sub-targets?”. That’s provided we can even set these sub-targets sensibly, which is no easy task.
 
