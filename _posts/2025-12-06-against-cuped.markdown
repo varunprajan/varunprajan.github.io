@@ -57,14 +57,14 @@ The great insight of CUPED is that the metric of interest is often correlated wi
 
 ![CUPED schematic](/assets/img/cuped_schematic.png)
 
-Let’s write some code! (Much of this is adapted from Matteo Courthoud’s excellent [blog post](https://matteocourthoud.github.io/post/cuped/#) about CUPED.) See [here](https://github.com/varunprajan/data-eng-blog/tree/34e9c3642573fe7591d6cbf9c35e55ac469e00f5/cuped) for the complete code, including a Jupyter notebook.
+Let’s write some code! (Much of this is adapted from Matteo Courthoud’s excellent [blog post](https://matteocourthoud.github.io/post/cuped/#) about CUPED.) See [here](https://github.com/varunprajan/data-eng-blog/tree/main/cuped) for the complete code, including a Jupyter notebook.
 
-In the data generation process, the continuous metric, $y$, is linearly related to the experiment group assignment (control = 0, treatment = 1), and to the pre-experiment value of $y$ ($X$). There is also Gaussian noise. The treatment effect is constant across all units (no heterogeneous treatment effects).
+In the data generation process, the continuous metric, $y$, is linearly related to the experiment group assignment (control = 0, treatment = 1), and to the pre-experiment value of $y$, which we'll call $X$. There is also Gaussian noise. The treatment effect is constant across all units (no heterogeneous treatment effects).
 
 $X$, in turn, might also be related to the experiment group assignment, if we have imperfect randomization/pre-exposure bias. (In this case, users in treatment stream for longer than users in control, even before the experiment begins.)
 
 ```python
-# adapted https://github.com/matteocourthoud/Blog-Posts/blob/9b5ff8276b8a197ccbbe97fa1e26f3e87871544d/notebooks/src/dgp_collection.py
+# adapted from https://github.com/matteocourthoud/Blog-Posts/blob/9b5ff8276b8a197ccbbe97fa1e26f3e87871544d/notebooks/src/dgp_collection.py
 class DataGenerationContinuousMetric:
     def __init__(
         self,
@@ -87,14 +87,17 @@ class DataGenerationContinuousMetric:
         # Treatment status (0 = control, 1 = treatment)
         experiment_group = rng.choice(a=[0, 1], size=N)
 
-        # Individual outcome pre-treatment
+        # Pre-treatment value of metric (Gaussian)
         y0_noise = rng.normal(loc=0.0, scale=1.0, size=N)
         y0 = self.y0_intercept + self.y0_bias * experiment_group + y0_noise
+        
+        # Metric (linearly related to pre-treatment value of metric)
         y1_noise = rng.normal(loc=0.0, scale=1.0, size=N)
         y1 = y0 + self.y1_offset + self.treatment_effect * experiment_group + y1_noise
 
         # Generate the dataframe
         # use y0 (pre-treatment value of metric) as the covariate, X
+        # rename y1 to y
         df = pd.DataFrame(
             {"i": i, "experiment_group": experiment_group, "X": y0, "y": y1}
         )
@@ -102,7 +105,7 @@ class DataGenerationContinuousMetric:
         return df
 ```
 
-When we run `generate_data`, we’ll create a DataFrame of `N` rows, one for each user. Our goal is to detect the true treatment effect with as little variance as possible. To avoid having to derive the standard error analytically, we’ll simply run a lot of simulations with different `seed` values, and compute the standard deviation of the effect size estimates manually, akin to bootstrapping.
+When we run `generate_data`, we’ll create a DataFrame of `N` rows, one for each user. Our goal is to estimate the true treatment effect with as little variance as possible (small standard error). To avoid having to derive the standard error analytically, we’ll simply run a lot of simulations with different `seed` values, and compute the standard deviation manually, Monte Carlo style.
 
 Here’s a simulation routine (again, adapted from Matteo Courthoud’s blog post):
 
@@ -115,7 +118,7 @@ def simulate(dgp, estimators, N_trials=1000, sample_size=10000):
         # Draw data
         df = dgp.generate_data(seed=trial_num, N=sample_size)
 
-        # Naive estimate
+        # Iterate over estimators, generating estimate for each
         for estimator, estimator_func in estimators:
             estimate = estimator_func(df)
             result = {
@@ -128,7 +131,7 @@ def simulate(dgp, estimators, N_trials=1000, sample_size=10000):
     return pd.DataFrame(results)
 ```
 
-We supply the `estimators`, which are functions that take the dataframe and return the treatment effect estimate. Below are the first two estimators we’ll focus on: the “naive” estimate, which is what a simple t-test would give you, and the “cuped” estimate, which uses the pre-experiment data, `X`, to reduce the variance of `y`.
+We supply the `estimators`, which are functions that take the dataframe and return the treatment effect estimate. Below are the first two estimators we’ll focus on: the “naive” estimate, which is what a simple t-test would give you, and the "CUPED” estimate, which uses the pre-experiment data, `X`, to reduce the variance of `y`.
 
 ```python
 def naive(df):
@@ -174,7 +177,7 @@ And, in visual form:
 
 As expected, both techniques recover the correct treatment effect (0.1). CUPED has a much smaller standard deviation, though (roughly, 0.0191/0.027 = 71%). This means that, in this synthetic example, we can run this test for 1 - 0.71^2 = 50% less time with CUPED, and get the same statistical power. Cool!
 
-## 5 problems
+## 5 problems with CUPED
 
 Now comes the part where I explain why, disappointingly, the previous example is basically as rosy as it gets. In practice, CUPED can be much less effective, or completely ineffective. I don’t want to discount cases where it works well. But, at least in my current work, those are few and far between.
 
@@ -187,15 +190,15 @@ Suppose we want to drive streaming time for new users on Spotify. The “pre-exp
 As Eppo [explains](https://docs.geteppo.com/statistics/cuped/),
 
 > The standard CUPED approach does not help for experiments where no pre-experiment data exists (e.g. experiments on new users, such as onboarding flows).”
-
-Because we also use **assignment properties** as covariates in the regression adjustments model, we are able to reduce variance for these experiments as well, which leads to smaller confidence intervals for such experiments.
+>
+> Because we also use **assignment properties** as covariates in the regression adjustments model, we are able to reduce variance for these experiments as well, which leads to smaller confidence intervals for such experiments.
 > 
 
-Put differently: one problem with CUPED is that, in the typical implementation, we use the pre-experiment metric to adjust the experiment metric. But this approach is part of a larger class of “covariate adjustment” methods for reducing variance. **We don’t have to use the pre-experiment metric as the covariate**. **We can use any covariate that is known at exposure time or before**.
+Put differently: one problem with CUPED is that, in the typical implementation, we use the pre-experiment metric to adjust the experiment metric. But this approach is part of a larger class of “covariate adjustment” methods for reducing variance. **We don’t have to use the pre-experiment metric as the sole covariate**. **We can use any number of covariates that are known at exposure time or before.**
 
 For new users on Spotify, we might know their device, country, or acquisition source, and we might be able to infer other characteristics, like age and gender. To the extent that these are correlated with streaming time, they can help reduce variance. Eppo has termed this approach “CUPED++”, but, in my view, this isn’t really CUPED anymore.
 
-Unfortunately, in my experience, “demographic” covariates like country (as opposed to “usage-based” covariates) tend to be weak predictors of usage metrics. The efficacy of CUPED, and other variance reduction techniques, is basically proportional to this predictive power ($R^2$, roughly speaking). So, if assignment-time covariates are **only weakly correlated** with the metric of interest, as they typically are for new units, then the gains from variance reduction will be correspondingly small.
+Unfortunately, in my experience, “demographic” covariates like country — as opposed to “usage-based” covariates, like the pre-experiment value of the metric — tend to be weak predictors of usage metrics. The efficacy of CUPED, and other variance reduction techniques, is basically proportional to this predictive power ($R^2$, roughly speaking). So, if assignment-time covariates are **only weakly correlated** with the metric of interest, as they typically are for new units, then the gains from variance reduction will be correspondingly small.
 
 When employing variance reduction, it’s important to ask: **how much of the heterogeneity in the metric can be explained by covariates** (whether the pre-experiment metric, or others)? If the answer is “not much”, CUPED, or even “CUPED++”, is not likely to be effective.
 
@@ -205,7 +208,7 @@ Product development, especially at smaller companies, often focuses on getting �
 
 So, typically, the primary metric in an experiment will be some version of what I discussed above. Whether a user paid. Whether a team upgraded. How long a particular playlist was listened to. Group listening session time. Audiobook consumption. Etc.
 
-The problem is that the pre-experiment metric is 0 for users who haven’t done those things before. An experiment designed to get free users to pay will not benefit from CUPED! **That’s true even if these users aren’t new users.** In the case where the targeted population is a mix of users — some who listen to podcasts, some who don’t — CUPED is more ineffective the larger the latter group becomes relative to the former.
+The problem is that the pre-experiment metric is 0 for users who haven’t done those things before. An experiment designed to get free users to pay will not benefit from CUPED! **That’s true even if these users aren’t new users.** In the case where the targeted population is a mix of users — some of whom have done the target action before, some who haven't — CUPED is more ineffective the larger the latter group becomes relative to the former.
 
 CUPED came out of Microsoft, where much of the product development is incremental, not greenfield. In these cases, CUPED is more likely to be successful. Say we’re trying to increase search success of Bing, or trying to reduce error rates with Microsoft Office. It seems likely that some (much?) of the heterogeneity in these metrics is at the user level. (For instance, users with worse devices are more likely to have errors.) Sadly, this kind of experimentation isn’t representative of that at many tech companies.
 
@@ -223,13 +226,13 @@ Before investing heavily into CUPED or other variance reduction techniques, you 
 
 I’ve always been slightly peeved by the toy examples used to demonstrate the power of CUPED. They employ nice and neat Gaussian distributions. In practice, things aren’t so simple!
 
-Before using CUPED, or other variance reduction techniques, it’s worth asking: why is the metric high-variance to begin with? Some possible explanations:
+Before using CUPED, or other variance reduction techniques, it’s worth asking: **why is the metric high-variance to begin with**? Some possible explanations:
 
 1. The metric has bad values. Some users stream for more than 24 hours in a day. (E.g., they are bots, or are running a scheme like [this one](https://www.vice.com/en/article/how-to-become-a-millionaire-by-streaming-music-on-spotify/).) It’s better to clean up bad values than to paper over them with CUPED.
 2. The metric has (valid) outliers. Some companies contribute disproportionate revenue to your SaaS business. Some people have unusually laggy devices. CUPED might help, marginally, in these cases, but it would involve a regression that is unduly influenced by “[high-leverage](https://en.wikipedia.org/wiki/Leverage_(statistics))” observations. A better approach would be to [winsorize](https://en.wikipedia.org/wiki/Winsorizing) these outliers, or to use a regression robust to outliers, like [quantile regression](https://engineering.atspotify.com/2022/03/comparing-quantiles-at-scale-in-online-a-b-testing). 
-3. The metric doesn’t have outliers, but is very right-tailed/skewed. Such distributions abound in tech. [Most people](https://www.reddit.com/r/chess/comments/12vd1xe/chesscom_percentiles_april_2023/) are around 400-1000 Elo on chess.com, but some are 2500+. Many people stream Taylor Swift a little bit, but some are superfans. Some artists, like [Bad Bunny](https://abcnews.go.com/GMA/Culture/2025-spotify-wrapped-bad-bunny-taylor-swift/story?id=128074125) or The Weekend, receive orders of magnitude more streams, and payouts, than the median artist. Once again, winsorization can be a useful approach here. Or quantile regression. Or turning the continuous metric into a binary one. (At Spotify, we used to have a metric called “deep listens”, which meant a user streamed more than 15 streams for a particular playlist. It was a binary version of a continuous metric: playlist streams.)
+3. The metric doesn’t have outliers, but is very right-tailed/skewed. Such distributions abound in tech. [Most people](https://www.reddit.com/r/chess/comments/12vd1xe/chesscom_percentiles_april_2023/) are around 400-1000 Elo on chess.com, but some are 2500+. Many people stream Taylor Swift a little bit, but some are superfans. Some artists, like [Bad Bunny](https://abcnews.go.com/GMA/Culture/2025-spotify-wrapped-bad-bunny-taylor-swift/story?id=128074125) or The Weeknd, receive orders of magnitude more streams, and payouts, than the median artist. Once again, winsorization can be a useful approach here. Or quantile regression. Or turning the continuous metric into a binary one. (At Spotify, we used to have a metric called “deep listens”, which meant a user had more than 15 streams from a particular playlist. It was a binary version of a continuous metric: playlist streams.)
 
-All of these approaches (winsorization, outlier removal, binarizing a continuous metric) squeeze variance out of the original metric. It makes sense, then, that subsequent “squeezing” would be less effective: the winsorized or binarized metric would benefit much less from CUPED or other variance reduction techniques than the original metric. Let’s try to prove this!
+All of these approaches — winsorization, outlier removal, binarizing a continuous metric — squeeze variance out of the original metric. It makes sense, then, that subsequent “squeezing” would be less effective: the winsorized or binarized metric would benefit much less from CUPED or other variance reduction techniques than the original metric. Let’s try to prove this!
 
 Suppose the pre-treatment covariate, $X$, comes from a lognormal distribution, instead of a Gaussian one (this causes the distribution of both $X$ and $y$ to be right-tailed):
 
@@ -259,15 +262,21 @@ elif binarize_q is not None:
 
 We can repeat the original simulation, two times. In the first, we winsorize at the 95th percentile. In the second, we binarize at the 50th percentile. We find (see notebook):
 
-| **Dataset** | Variance Reduction (%) |
-| --- | --- |
-| original | 83% |
-| winsorized | 47% |
-| binarized | 16% |
+| **Dataset** | Variance Reduction (%) | z-score (Naive) | z-score (CUPED)
+| --- | --- | --- | --- |
+| original | 83% | 2.16 | 5.23
+| winsorized | 47% | 2.95 | 4.07
+| binarized | 16% | 2.88 | 3.14
 
-One important note: because of the way this simulation was constructed — homogeneous treatment effect, strongly linear relationship between pre-treatment covariate and metric, etc. — the CUPED-adjusted, non-winsorized metric still performs the best. It has the highest “z-score” (see code/notebook) and, of course, winsorization or binarization change the metric being measured, so we can’t expect to recover the original effect size (again, see code/notebook).
+One important note: because of the way this simulation was constructed — homogeneous treatment effect, strongly linear relationship between pre-treatment covariate and metric, etc. — the CUPED-adjusted, non-winsorized metric still performs the best. It has the highest “z-score” and, of course, winsorization or binarization change the metric being measured, so we can’t expect to recover the original effect size (see code/notebook).
 
-But the point is that the benefits of CUPED are often overstated. If you do **nothing** to your continuous metric, CUPED can yield very large variance reduction. But usually you’ll use winsorization, outlier removal, or binarization, and in these cases the benefits from variance reduction are often much smaller. “Truncating” metrics is standard practice in tech. So why do proponents of CUPED act as if it’s not?
+However, note that winsorized and binarized metrics are more **sensitive** than the original metric (without CUPED). The z-scores are higher, and it's easier to detect an effect. I'd recommending trying such approaches before investing in variance reduction.
+
+Another important point is that the benefits of CUPED are often overstated. If you do **nothing** to your continuous metric, CUPED can yield very large variance reduction (here, >80%). But usually you’ll use winsorization, outlier removal, or binarization, and in these cases the benefits from variance reduction are often much smaller. “Truncating” metrics is standard practice in tech. So why do proponents of CUPED act as if it’s not?
+
+(Side note: the CUPED results I reported on for the truncated metrics is not exactly CUPED. The metric is truncated, but the pre-experiment value is not. That is, we're not using the exact same metric as the pre-experiment covariate.
+
+It turns out that CUPED works less well if the pre-experiment value is also truncated. Again, this points to the need to investigate a variety of covariates, not just the pre-experiment value.)
 
 ### Problem 4: CUPED shouldn’t be used for binary metrics
 
@@ -287,7 +296,7 @@ def cuped_binary(df):
 
 (Note the `logit` instead of `ols` for the “first-stage” regression.) 
 
-Again, run the usual simulation:
+Run the usual simulation:
 
 ```python
 dgp = utils.DataGenerationContinuousMetric(
@@ -297,30 +306,30 @@ dgp = utils.DataGenerationContinuousMetric(
 estimators = [
     ("naive", utils.naive),
     ("CUPED", utils.cuped),
-	("CUPED binary", utils.cuped_binary)
+    ("CUPED binary", utils.cuped_binary),
 ]
 results_frame_binarize = utils.simulate(
     dgp,
     estimators=estimators,
     N_trials=1000,
     sample_size=10000,
-    binarize_q=0.5
+    binarize_q=0.5,
 )
 ```
 
 !["CUPED binary"](/assets/img/cuped_binary.png)
 
-Although the differences might look small, the “CUPED binary” estimator is clearly the best. It provides the tightest estimate of the true effect. In this case, while ordinary CUPED yields a 16% variance reduction, the binary CUPED approach achieves 33% variance reduction. Not bad for a relatively simple fix!
+Although the differences might look small, the “CUPED binary” estimator is clearly the best. It provides the tightest estimate of the true effect. In this case (see notebook), while ordinary CUPED yields a 16% variance reduction, the binary CUPED approach achieves 33% variance reduction. Not bad for a relatively simple fix!
 
 ### Problem 5: CUPED doesn’t fix pre-exposure bias
 
-Pre-exposure bias is fairly common in experimentation. The treatment and control groups will never exactly agree in every important covariate, particularly when the distributions of those covariates are skewed. It is possible, by chance, to end up with more users with higher $X$ values in treatment. Some experimentation platforms try to weed out “bad randomization seeds” (see [here](https://www.microsoft.com/en-us/research/articles/patterns-of-trustworthy-experimentation-pre-experiment-stage/) for an example), but many do not. Instead they use covariate adjustment techniques, like CUPED, to mitigate the bias after the fact.
+Pre-exposure bias is a common problem in experimentation. The treatment and control groups will never exactly agree in every important covariate, particularly when the distributions of those covariates are skewed. It is possible, by chance, to end up with more users with higher $X$ values in treatment. Some experimentation platforms try to weed out “bad randomization seeds” (see [here](https://www.microsoft.com/en-us/research/articles/patterns-of-trustworthy-experimentation-pre-experiment-stage/) for Microsoft's approach), but many do not. Instead they use covariate adjustment techniques, like CUPED, to mitigate the bias after the fact.
 
-But does CUPED actually correct for pre-exposure bias? It seems like it *should*. After all, the bias is from the covariate, $X$, being imbalanced, and we’re basically trying to subtract out its effect. As it turns out, though, CUPED doesn’t totally solve the problem. Here’s an example (again, adapted from Matteo Courthoud’s blog post, with an artificially large treatment effect to clearly show the problem):
+But does CUPED actually correct for pre-exposure bias? It seems like it *should*. After all, the bias is from the covariate, $X$, being imbalanced, and we’re basically trying to subtract out its effect. As it turns out, though, CUPED doesn’t totally solve the problem. Here’s an example (again, adapted from Matteo Courthoud’s blog post, with an artificially large treatment effect of 1 to clearly show the problem):
 
 ```python
 dgp = DataGenerationContinuousMetric(
-	treatment_effect=1, y0_bias=1
+    treatment_effect=1, y0_bias=1
 )
 estimators = [
     ("naive", naive),
@@ -341,7 +350,7 @@ results_frame = utils.simulate(
 
 !["pre_exposure_bias"](/assets/img/cuped_pre_exposure_bias.png)
 
-The true effect is 1, the naive estimate is 2 (because the bias we induced is 1), but CUPED gives back neither 1 nor 2: instead, it overcorrects in the opposite direction, and returns 0.8.
+The true effect is 1. The naive estimate is 2 (because the bias we induced is an extra 1). CUPED, however, returns 0.8, which is neither 1 nor 2: it overcorrects in the opposite direction.
 
 This result is surprising if you believe statements like this ([from Statsig](https://docs.statsig.com/experiments/statistical-methods/methodologies/cuped)):
 
@@ -375,23 +384,23 @@ When we rerun the simulation, we see that “advanced CUPED” does indeed recov
 
 !["pre_exposure_bias_2"](/assets/img/cuped_pre_exposure_bias_2.png)
 
-As far as I can tell, though, most people (even Statsig, possibly?) still use the naive CUPED implementation, and are apparently unaware of this problem. So, word to the wise: be careful when implementing CUPED, and use `cuped_advanced` instead of `cuped` if pre-exposure bias is a problem.
+As far as I can tell, though, most people (even Statsig, possibly?) are apparently unaware of this issue. So, word to the wise: be careful when implementing CUPED, and use `cuped_advanced` instead of `cuped` if pre-exposure bias is expected to be a problem.
 
-(Side note: as you can see, “naive CUPED” actually does have a smaller standard error than “advanced CUPED”, even though the mean of the distribution is wrong. There is no free lunch here: the estimator that works better in the presence of pre-exposure bias is not the estimator that works best if we can assume away that bias.)
+(Side note: as you can see, “simple CUPED” actually does have a smaller standard error than “advanced CUPED”, even though the estimate is biased. There is no free lunch here: the estimator that works better in the presence of pre-exposure bias is not the estimator that works best if we can assume away that bias.)
 
 ## Summary and closing thoughts
 
 Variance reduction is as close as we get to a free lunch in experimentation. Without sacrificing power, we can run shorter tests and gain insights faster. But variance reduction is not always useful, and CUPED, in particular, suffers from several problems.
 
-CUPED uses the pre-experiment value of the metric as the sole covariate. It doesn’t work when this value doesn’t exist (as with new users), or when it’s zero (as with existing users being encouraged to do something for the first time, such as purchase). In these situations, it’s better to use “assignment-time covariates” (”CUPED++”) rather than CUPED, but don’t expect much variance reduction unless these covariates are strongly correlated with the metric — which, in my experience, is usually not the case.
+CUPED uses the pre-experiment value of the metric as the sole covariate. It doesn’t work when this value doesn’t exist (as with new users), or when it’s zero (as with existing users being encouraged to do something for the first time, such as purchase). In these situations, it’s better to use “assignment-time covariates” (”CUPED++”) rather than CUPED, but don’t expect much variance reduction unless these covariates are well-correlated with the metric — which, in my experience, is usually not the case.
 
-The value of variance reduction techniques is often demonstrated in examples involving continuous metrics. Such metrics may intrinsically have high variance, but the variance can be reduced by outlier removal, winsorization, binarization, and other techniques. After applying these techniques, CUPED helps much less. We’ve squeezed out some of the variance, so CUPED has less left to further squeeze. It’s worth trying these (easy-to-implement) techniques before investing in variance reduction.
+The value of variance reduction techniques is often demonstrated in examples involving continuous metrics. Such metrics may intrinsically have high variance, but this variance can be reduced by outlier removal, winsorization, binarization, and other techniques. (This also generally improves metric sensitivity.) After truncating the metric, CUPED helps much less. We’ve squeezed out some of the variance, so CUPED has less left to further squeeze. It’s worth trying these (easy-to-implement) techniques before investing in variance reduction. And you should be wary of taking estimates of variance reduction at face value.
 
-“Naive CUPED” also simply isn’t correct in some cases. It can be improved for binary metrics by using logistic instead of linear regression for the “first stage”. And it can also be fixed for the case of pre-exposure bias. 
+“Simple CUPED” also just isn’t correct in some cases. It can be improved for binary metrics by using logistic instead of linear regression for the “first stage”. And, surprisingly, it also doesn't totally fix pre-exposure bias, and "advanced CUPED" should be used instead.
 
-I found it somewhat unsatisfying to learn that CUPED requires these ad-hoc adjustments. Is there a less arbitrary approach to covariate adjustment?
+I found it somewhat unsatisfying to learn that CUPED requires these ad-hoc adjustments. Is there a less arbitrary approach to variance reduction?
 
-In fact, there is! The pre-exposure bias correction (”advanced CUPED”) is equivalent to a “fully-interacted” linear regression model, ANCOVA2. See code below. And the correction for binary metrics is what packages like EconML [do by default for discrete outcomes](https://github.com/py-why/EconML/issues/881).
+In fact, there is! "Advanced CUPED" is equivalent to a “fully-interacted” linear regression model, ANCOVA2. See code below. And using a classifier, not a regressor, for binary metrics to use logistic regression is what packages like EconML [do by default for discrete outcomes](https://github.com/py-why/EconML/issues/881).
 
 ```python
 def ancova2(df):
@@ -408,10 +417,10 @@ def ancova2(df):
     return estimate
 ```
 
-If there’s a lesson here, it’s that we should use standard econometric techniques **instead of ad-hoc adjustments like CUPED**. In fact, every example in this post can be re-done using “double machine learning” models in EconML with linear first and second stages. (I’ll demonstrate this in a subsequent blogpost!)
+If there’s a lesson here, it’s that we should use **standard econometric techniques instead of ad-hoc adjustments like CUPED**. In fact, every example in this post can be re-done using “double machine learning” models in EconML with (generalized) linear first and second stages. (I’ll demonstrate this in a subsequent blogpost!)
 
 (Side note: some people mistakenly assume that naive CUPED is equivalent to a regression like $y \sim X + T$. See [Matteo Courthoud's blogpost](https://matteocourthoud.github.io/post/cuped/) for a demonstration that this isn't true.)
 
-[Double ML](https://docs.doubleml.org/stable/intro/intro.html#intro) models have a number of benefits over CUPED. They work for binary or continuous outcomes, and binary or continuous treatments. They can account for any number of covariates, not just the pre-experiment metric. They also work for experimental and observational data — e.g., when treatment and control aren’t balanced, and there is selection bias. Finally, they can even capture heterogeneous treatment effects and non-linear relationships in the data (although these applications tend to be data-greedy). 
+[Double ML](https://docs.doubleml.org/stable/intro/intro.html#intro) models have a number of benefits over CUPED. They work for binary or continuous outcomes, and binary or continuous treatments. They can account for any number of covariates, not just the pre-experiment metric. They also work for experimental and observational data — e.g., when treatment and control aren’t balanced, and there is selection bias. They can even capture heterogeneous treatment effects and non-linear relationships in the data (although these applications tend to be data-greedy). Most importantly, they tend to have good numerical properties, and are less sensitive to incorrect estimates of nuisance parameters (["Neyman orthogonality"](https://www.stats.ox.ac.uk/~evans/APTS/double-machine-learning.html))
 
 Double ML models are not easy to implement in SQL, even when the individual stages are linear. There’s a reason CUPED is still king: data scientists are lazy, and we’ll go with the “good enough” option if it’s much easier to code. But this dilemma seems artificial to me. I’d hope that commercial platforms would do the hard work of implementing the correct solution so we wouldn’t have to choose.
