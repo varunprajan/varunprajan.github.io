@@ -47,7 +47,7 @@ I find CUPED useful for my own work, on occasion. That being said, it has some s
 
 Most practitioners are aware of at least some of these problems (in particular, 1 and 2), but I have not seen all of them presented in a single place before.
 
-I’ll also try to provide some code examples to allow readers to follow along more easily. Let’s go!
+I’ll also provide some code examples to allow readers to follow along more easily. Let’s go!
 
 ## A basic CUPED example
 
@@ -57,9 +57,9 @@ The great insight of CUPED is that the metric of interest is often correlated wi
 
 ![CUPED schematic](/assets/img/cuped_schematic.png)
 
-Let’s write some code! (Much of this is adapted from Matteo Courthoud’s excellent [blog post](https://matteocourthoud.github.io/post/cuped/#) about CUPED.)
+Let’s write some code! (Much of this is adapted from Matteo Courthoud’s excellent [blog post](https://matteocourthoud.github.io/post/cuped/#) about CUPED.) See [here](https://github.com/varunprajan/data-eng-blog/tree/34e9c3642573fe7591d6cbf9c35e55ac469e00f5/cuped) for the complete code, including a Jupyter notebook.
 
-The continuous metric, $y$, is linearly related to the experiment group assignment (control = 0, treatment = 1), and to the pre-experiment value of $y$ ($X$). There is also Gaussian noise. The treatment effect is constant across all units (no heterogeneous treatment effects).
+In the data generation process, the continuous metric, $y$, is linearly related to the experiment group assignment (control = 0, treatment = 1), and to the pre-experiment value of $y$ ($X$). There is also Gaussian noise. The treatment effect is constant across all units (no heterogeneous treatment effects).
 
 $X$, in turn, might also be related to the experiment group assignment, if we have imperfect randomization/pre-exposure bias. (In this case, users in treatment stream for longer than users in control, even before the experiment begins.)
 
@@ -234,7 +234,7 @@ All of these approaches (winsorization, outlier removal, binarizing a continuous
 Suppose the pre-treatment covariate, $X$, comes from a lognormal distribution, instead of a Gaussian one (this causes the distribution of both $X$ and $y$ to be right-tailed):
 
 ```python
-# Individual outcome pre-treatment
+# (in the __init__ function for the data generating process class)
 if self.y0_noise_dist == "normal":
     y0_noise = rng.normal(loc=0.0, scale=1.0, size=N)
 elif self.y0_noise_dist == "lognormal":
@@ -297,11 +297,11 @@ dgp = utils.DataGenerationContinuousMetric(
 estimators = [
     ("naive", utils.naive),
     ("CUPED", utils.cuped),
-		("CUPED binary", utils.cuped_binary)
+	("CUPED binary", utils.cuped_binary)
 ]
 results_frame_binarize = utils.simulate(
     dgp,
-    estimators=estimators_binary,
+    estimators=estimators,
     N_trials=1000,
     sample_size=10000,
     binarize_q=0.5
